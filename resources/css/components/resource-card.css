@@ -1,0 +1,178 @@
+/* =========================
+   COMMON RESOURCE CARD
+========================= */
+
+.resource-card {
+    background: #ffffff;
+    border: 1px solid rgba(128, 0, 0, 0.12);
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.06);
+    transition: 0.2s ease;
+}
+
+.resource-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 38px rgba(128, 0, 0, 0.13);
+}
+
+.resource-card-cover {
+    height: 190px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+.resource-card-cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+}
+
+.resource-card-type {
+    position: absolute;
+    left: 16px;
+    bottom: 14px;
+    z-index: 2;
+    background: #ffffff;
+    color: #800000;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.resource-card-body {
+    padding: 20px;
+}
+
+.resource-card-title {
+    color: #800000;
+    font-size: 19px;
+    font-weight: 900;
+    margin-bottom: 6px;
+}
+
+.resource-card-author {
+    color: #6f6660;
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.resource-card-description {
+    color: #756d68;
+    font-size: 13px;
+    line-height: 1.6;
+    min-height: 63px;
+}
+
+.resource-card-details {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin: 15px 0;
+    color: #6e625e;
+    font-size: 13px;
+}
+
+.resource-card-details span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.resource-card-details i {
+    color: #800000;
+}
+
+.resource-card-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 14px 0;
+}
+
+.resource-status {
+    width: fit-content;
+    border-radius: 999px;
+    padding: 6px 11px;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.resource-status.available {
+    background: rgba(47, 92, 40, 0.12);
+    color: #2f5c28;
+}
+
+.resource-status.digital {
+    background: rgba(0, 70, 140, 0.12);
+    color: #00468c;
+}
+
+.resource-status.room-use {
+    background: rgba(218, 165, 32, 0.16);
+    color: #8a6500;
+}
+
+.resource-status.unavailable {
+    background: rgba(179, 38, 30, 0.12);
+    color: #b3261e;
+}
+
+.resource-borrow-count {
+    color: #80756f;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.resource-card-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.resource-action {
+    border-radius: 999px;
+    padding: 9px 13px;
+    font-size: 12px;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.resource-action.primary {
+    background: #800000;
+    color: #ffffff;
+}
+
+.resource-action.primary:hover {
+    background: #daa520;
+    color: #ffffff;
+}
+
+.resource-action.secondary {
+    background: #f1ede7;
+    color: #800000;
+}
+
+.resource-action.secondary:hover {
+    background: #800000;
+    color: #ffffff;
+}
+
+.resource-action.disabled {
+    background: #ece7df;
+    color: #8c817c;
+    cursor: not-allowed;
+}
+
+/* compact version for home page */
+.resource-card-compact .resource-card-details {
+    display: none;
+}
+
+.resource-card-compact .resource-card-description {
+    min-height: 58px;
+}

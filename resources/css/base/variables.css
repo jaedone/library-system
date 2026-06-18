@@ -1,0 +1,15 @@
+:root {
+    --pup-maroon: #800000;
+    --pup-white: #ffffff;
+    --pup-yellow: #ffdf00;
+    --pup-gold: #daa520;
+    --pup-black: #000000;
+
+    --sidebar-width: 285px;
+    --sidebar-collapsed-width: 88px;
+    --sidebar-gap: 22px;
+
+    --soft-bg: #f7f5f2;
+    --border-soft: rgba(128, 0, 0, 0.14);
+    --shadow-soft: 0 18px 38px rgba(0, 0, 0, 0.12);
+}

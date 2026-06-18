@@ -1,0 +1,340 @@
+/* =========================
+   CATALOG PAGE
+========================= */
+
+.catalog-page {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+}
+
+/* HERO */
+
+.catalog-hero {
+    min-height: 520px;
+    border-radius: 34px;
+    padding: 88px 42px 64px;
+    margin: 12px 12px 34px 0;
+
+    background-image:
+        linear-gradient(
+            to bottom,
+            rgba(45, 0, 0, 0.58) 0%,
+            rgba(60, 0, 0, 0.48) 42%,
+            rgba(128, 89, 0, 0.44) 100%
+        ),
+        var(--catalog-bg);
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 18px 40px rgba(128, 0, 0, 0.16);
+    overflow: hidden;
+}
+
+.catalog-hero-content {
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.catalog-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #ffdf00;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+}
+
+.catalog-hero h1 {
+    max-width: 860px;
+    margin: 0 auto 16px;
+
+    font-size: clamp(38px, 5vw, 64px);
+    font-weight: 950;
+    line-height: 1.04;
+    letter-spacing: -0.04em;
+}
+
+.catalog-hero p {
+    max-width: 780px;
+    margin: 0 auto 34px;
+
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 18px;
+    line-height: 1.7;
+}
+
+/* SEARCH + FILTER FORM */
+
+.catalog-search-filter-form {
+    width: 100%;
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+.catalog-hero-search {
+    width: 100%;
+    max-width: 780px;
+    height: 66px;
+    margin: 0 auto;
+
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.86);
+    border: 2px solid #daa520;
+
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 0 10px 0 24px;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.24);
+    backdrop-filter: blur(10px);
+}
+
+.catalog-hero-search i {
+    color: #800000;
+    font-size: 22px;
+}
+
+.catalog-hero-search input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+
+    color: #241312;
+    font-size: 16px;
+}
+
+.catalog-hero-search input::placeholder {
+    color: rgba(36, 19, 18, 0.58);
+}
+
+.catalog-hero-search button {
+    height: 48px;
+    border: none;
+    border-radius: 999px;
+
+    background: #800000;
+    color: #ffffff;
+
+    padding: 0 26px;
+    font-weight: 900;
+    transition: 0.2s ease;
+}
+
+.catalog-hero-search button:hover {
+    background: #5a0000;
+}
+
+/* CLEAN FILTER PANEL */
+
+.catalog-filter-row {
+    width: 100%;
+    margin: 24px auto 0;
+    padding: 20px;
+
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 18px 36px rgba(0, 0, 0, 0.18);
+    backdrop-filter: blur(12px);
+}
+
+.catalog-filter-field {
+    text-align: left;
+}
+
+.catalog-filter-field label {
+    display: block;
+    color: #800000;
+    font-size: 12px;
+    font-weight: 900;
+    margin-bottom: 7px;
+}
+
+.catalog-filter-field input,
+.catalog-filter-field select {
+    width: 100%;
+    border: 1.5px solid rgba(128, 0, 0, 0.16);
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 12px 14px;
+    outline: none;
+
+    color: #241312;
+    font-size: 14px;
+}
+
+.catalog-filter-field input:focus,
+.catalog-filter-field select:focus {
+    border-color: #800000;
+    box-shadow: 0 0 0 4px rgba(128, 0, 0, 0.10);
+}
+
+.catalog-filter-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    margin-top: 18px;
+}
+
+.catalog-filter-btn,
+.catalog-clear-btn {
+    border-radius: 999px;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 900;
+    text-decoration: none;
+}
+
+.catalog-filter-btn {
+    border: none;
+    background: #800000;
+    color: #ffffff;
+}
+
+.catalog-filter-btn:hover {
+    background: #5a0000;
+}
+
+.catalog-clear-btn {
+    background: rgba(255, 255, 255, 0.82);
+    color: #800000;
+    border: 1.5px solid rgba(128, 0, 0, 0.18);
+}
+
+.catalog-clear-btn:hover {
+    background: #ffdf00;
+    color: #800000;
+}
+
+.catalog-results-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.catalog-results-section {
+    background: #ffffff;
+    border: 1px solid rgba(128, 0, 0, 0.1);
+    border-radius: 28px;
+    padding: 28px;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.06);
+}
+
+.catalog-results-header {
+    margin-bottom: 22px;
+}
+
+.catalog-results-kicker {
+    display: inline-block;
+    color: #800000;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.catalog-results-header h2 {
+    color: #1f1f1f;
+    font-weight: 900;
+    font-size: 23px;
+    margin: 0;
+}
+
+.catalog-results-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.catalog-pagination {
+    margin-top: 26px;
+    display: flex;
+    justify-content: center;
+}
+
+.catalog-empty {
+    grid-column: 1 / -1;
+    min-height: 260px;
+    border: 1px dashed rgba(128, 0, 0, 0.22);
+    border-radius: 24px;
+    background: #faf7f2;
+    color: #6c625e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    text-align: center;
+    padding: 34px;
+}
+
+.catalog-empty i {
+    color: #800000;
+    font-size: 42px;
+}
+
+.catalog-empty h3 {
+    color: #800000;
+    font-weight: 900;
+    margin: 0;
+}
+
+.catalog-empty p {
+    margin: 0;
+}
+
+.catalog-is-loading {
+    opacity: 0.55;
+    pointer-events: none;
+    transition: opacity 0.18s ease;
+}
+
+@media (max-width: 1400px) {
+    .catalog-results-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 1000px) {
+    .catalog-results-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .catalog-results-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .catalog-results-section {
+        padding: 22px;
+        border-radius: 24px;
+    }
+}

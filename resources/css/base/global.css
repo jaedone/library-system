@@ -1,0 +1,10 @@
+body {
+    margin: 0;
+    background: var(--soft-bg);
+    color: var(--pup-black);
+    font-family: "Inter", "Segoe UI", Arial, sans-serif;
+}
+
+.library-layout {
+    min-height: 100vh;
+}
