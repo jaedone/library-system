@@ -5,7 +5,12 @@
 @import './layout/footer.css';
 
 @import './components/resource-card.css';
+@import './components/book-details-panel.css';
 
 @import './pages/home.css';
 @import './pages/catalog.css';
 @import './pages/auth.css';
+@import './pages/services.css';
+@import './pages/facilities.css';
+@import './pages/profile.css';
+@import './pages/password.css';

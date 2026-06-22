@@ -168,7 +168,6 @@
     cursor: not-allowed;
 }
 
-/* compact version for home page */
 .resource-card-compact .resource-card-details {
     display: none;
 }

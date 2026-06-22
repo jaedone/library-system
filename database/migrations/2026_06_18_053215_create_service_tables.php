@@ -9,15 +9,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('facilities', function (Blueprint $table) {
-            $table->id();
-            $table->string('facility_key', 100)->unique();
-            $table->string('facility_name', 150);
-            $table->text('description')->nullable();
-            $table->integer('capacity')->nullable();
-            $table->string('location', 255)->nullable();
-            $table->boolean('is_active')->default(true);
-            $table->timestamps();
-        });
+    $table->id();
+
+    $table->string('facility_key', 100)->unique();
+    $table->string('facility_name', 150);
+    $table->text('description')->nullable();
+
+    $table->integer('capacity')->nullable();
+    $table->string('location', 255)->nullable();
+
+    $table->string('availability_days', 150)->nullable();
+    $table->string('availability_hours', 150)->nullable();
+
+    $table->json('equipment')->nullable();
+    $table->json('usage_for')->nullable();
+
+    $table->string('image_path', 1000)->nullable();
+
+    $table->boolean('is_active')->default(true);
+});
 
         Schema::create('referral_requests', function (Blueprint $table) {
             $table->id();

@@ -461,4 +461,33 @@
     }
 </script>
 
+@php
+    $bookDetailsResources = collect($resources)
+        ->unique('id')
+        ->values()
+        ->map(function ($book) {
+            return [
+                'id' => $book->id,
+                'title' => $book->title ?? 'Untitled Resource',
+                'isbn' => $book->isbn ?? 'N/A',
+                'description' => $book->description ?? 'No description available.',
+                'cover_url' => !empty($book->cover_image_path)
+                    ? asset('storage/' . $book->cover_image_path)
+                    : asset('images/default-book-cover.png'),
+                'publication_year' => $book->publication_year ?? 'N/A',
+                'category_name' => $book->category_name ?? 'N/A',
+                'material_type_name' => $book->material_type_name ?? 'Library Material',
+                'authors' => $book->authors ?? 'Unknown Author',
+                'library_locations' => $book->library_locations ?? 'No location assigned',
+                'availability_statuses' => $book->availability_statuses ?? 'No copies available',
+                'total_copies' => $book->total_copies ?? 0,
+                'available_copies' => $book->available_copies ?? 0,
+            ];
+        });
+@endphp
+
+@include('common.book-details-panel', [
+    'bookDetailsResources' => $bookDetailsResources,
+])
+
 @endsection

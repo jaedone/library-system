@@ -17,16 +17,24 @@
 
     $borrowBlockReason = $borrowBlockReason ?? null;
 
-    $canReserveBorrow =
-        empty($borrowBlockReason)
+    $hasAccountRestriction = !empty($borrowBlockReason);
+
+    $canBorrow =
+        !$hasAccountRestriction
         && $isAvailable
+        && !$isDigital
+        && !$isReferenceOnly;
+
+    $canReserve =
+        !$hasAccountRestriction
+        && !$isDigital
         && !$isReferenceOnly;
 
     if (!$borrowBlockReason) {
-        if (!$isAvailable && !$isDigital) {
-            $borrowBlockReason = 'Not Available';
-        } elseif ($isReferenceOnly) {
+        if ($isReferenceOnly) {
             $borrowBlockReason = 'Room Use Only';
+        } elseif (!$isAvailable && !$isDigital) {
+            $borrowBlockReason = 'Not Available';
         }
     }
 @endphp
@@ -98,22 +106,52 @@
             </div>
 
             <div class="resource-card-actions">
-                <a href="{{ url('/catalog/' . $item->id) }}" class="resource-action secondary">
+                <button
+                    type="button"
+                    class="resource-action secondary"
+                    data-book-details-id="{{ $item->id }}"
+                >
                     View Details
-                </a>
+                </button>
 
                 @if ($isDigital && !empty($item->digital_url))
-                    <a href="{{ $item->digital_url }}" target="_blank" class="resource-action primary">
+                    <a
+                        href="{{ $item->digital_url }}"
+                        target="_blank"
+                        class="resource-action primary"
+                    >
                         Access Online
                     </a>
-                @elseif ($canReserveBorrow)
-                    <a href="{{ url('/reservations/create?resource_id=' . $item->id) }}" class="resource-action primary">
-                        Reserve/Borrow
-                    </a>
-                @else
+                @elseif ($hasAccountRestriction)
                     <span class="resource-action disabled" title="{{ $borrowBlockReason }}">
                         {{ $borrowBlockReason }}
                     </span>
+                @elseif ($isReferenceOnly)
+                    <span class="resource-action disabled" title="Room Use Only">
+                        Room Use Only
+                    </span>
+                @else
+                    @if ($canBorrow)
+                        <a
+                            href="{{ route('services.show', 'book-borrowing') }}?resource_id={{ $item->id }}"
+                            class="resource-action primary"
+                        >
+                            Borrow
+                        </a>
+                    @else
+                        <span class="resource-action disabled" title="{{ $borrowBlockReason }}">
+                            Borrow
+                        </span>
+                    @endif
+
+                    @if ($canReserve)
+                        <a
+                            href="{{ route('services.show', 'book-reservation') }}?resource_id={{ $item->id }}"
+                            class="resource-action secondary"
+                        >
+                            Reserve
+                        </a>
+                    @endif
                 @endif
             </div>
         </div>

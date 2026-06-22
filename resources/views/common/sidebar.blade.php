@@ -50,11 +50,6 @@
             <i class="bi bi-building"></i>
             <span>Facilities</span>
         </a>
-
-        <a href="{{ url('/about') }}" class="sidebar-link {{ request()->is('about*') ? 'active' : '' }}">
-            <i class="bi bi-info-circle"></i>
-            <span>About</span>
-        </a>
     </nav>
 
     {{-- ACCOUNT AREA --}}
