@@ -44,7 +44,7 @@
                     </div>
 
                     <div class="service-roulette-action">
-                        Browse Catalog
+                        Borrow Books
                     </div>
                 </a>
 

@@ -28,15 +28,18 @@ class ServiceController extends Controller
                 ->guest(route('login'))
                 ->with('status', 'Please sign in first to access this library service.');
         }
-
+        
         return view('services.show', [
-            'service' => $selectedService,
-            'serviceKey' => $service,
-            'availableCopies' => $this->availableCopies(),
-            'reservableResources' => $this->reservableResources(),
-            'activeBorrowTransactions' => $this->activeBorrowTransactions(),
-            'facilities' => $this->facilities(),
-        ]);
+    'service' => $selectedService,
+    'serviceKey' => $service,
+    'availableCopies' => $this->availableCopies(),
+    'reservableResources' => $this->reservableResources(),
+    'activeBorrowTransactions' => $this->activeBorrowTransactions(),
+    'facilities' => $this->facilities(),
+    'libraryBranches' => $this->libraryBranches(),
+    'materialTypes' => $this->materialTypes(),
+    'borrowingHistory' => $this->borrowingHistory(),
+]);
     }
 
     public function store(Request $request, string $service)
@@ -65,103 +68,120 @@ class ServiceController extends Controller
     }
 
     private function storeBookBorrowing(Request $request)
-    {
-        $validated = $request->validate([
-            'copy_id' => ['required', 'exists:resource_copies,id'],
-            'borrower_type' => ['required', 'string', 'in:student,faculty,employee'],
-            'material_group' => ['required', 'string', 'in:fiction,graduate_school,college_of_law,general'],
-            'purpose' => ['required', 'string', 'max:1000'],
+{
+    $validated = $request->validate([
+        'copy_id' => ['required', 'exists:resource_copies,id'],
+        'material_group' => ['required', 'string', 'in:fiction,graduate_school,college_of_law,general'],
+        'borrow_start_date' => ['required', 'date', 'after:today'],
+        'borrow_end_date' => ['required', 'date', 'after_or_equal:borrow_start_date'],
+        'purpose' => ['required', 'string', 'max:1000'],
+    ]);
+
+    $this->ensureNoBlockingPenalty();
+
+    $copy = DB::table('resource_copies as rc')
+        ->join('copy_statuses as cs', 'rc.copy_status_id', '=', 'cs.id')
+        ->where('rc.id', $validated['copy_id'])
+        ->where('rc.is_borrowable', true)
+        ->where('cs.status_key', 'available')
+        ->first();
+
+    if (!$copy) {
+        throw ValidationException::withMessages([
+            'copy_id' => 'The selected copy is not available for borrowing.',
         ]);
+    }
 
-        $this->ensureNoBlockingPenalty();
+    $borrowerType = Auth::user()->role->role_key ?? 'student';
 
+    $allowedDays = $this->getBorrowingDays(
+        $validated['material_group'],
+        $borrowerType
+    );
+
+    $borrowedAt = Carbon::parse($validated['borrow_start_date']);
+    $dueAt = Carbon::parse($validated['borrow_end_date']);
+
+    $selectedDays = $borrowedAt->diffInDays($dueAt) + 1;
+
+    if ($selectedDays > $allowedDays) {
+        throw ValidationException::withMessages([
+            'borrow_end_date' => "Borrowing period cannot exceed {$allowedDays} day(s).",
+        ]);
+    }
+
+    DB::table('borrow_transactions')->insert([
+        'user_id' => Auth::id(),
+        'copy_id' => $validated['copy_id'],
+        'reservation_id' => null,
+        'processed_by' => null,
+        'borrowed_at' => $borrowedAt,
+        'due_at' => $dueAt,
+        'returned_at' => null,
+        'status_id' => $this->borrowStatusId('pending'),
+        'remarks' => "Purpose: {$validated['purpose']}\nAllowed borrowing days: {$allowedDays}\nRequested days: {$selectedDays}",
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    return back()->with(
+        'success',
+        "Borrowing request submitted. Requested borrowing period: {$selectedDays} day(s)."
+    );
+}
+
+    private function storeBookReservation(Request $request)
+{
+    $validated = $request->validate([
+        'resource_id' => ['required', 'exists:resources,id'],
+        'copy_id' => ['nullable', 'exists:resource_copies,id'],
+        'usage_date' => ['required', 'date', 'after:today'],
+        'reservation_notes' => ['nullable', 'string', 'max:1000'],
+    ]);
+
+    if (!empty($validated['copy_id'])) {
         $copy = DB::table('resource_copies as rc')
             ->join('copy_statuses as cs', 'rc.copy_status_id', '=', 'cs.id')
             ->where('rc.id', $validated['copy_id'])
+            ->where('rc.resource_id', $validated['resource_id'])
             ->where('rc.is_borrowable', true)
             ->where('cs.status_key', 'available')
             ->first();
 
         if (!$copy) {
             throw ValidationException::withMessages([
-                'copy_id' => 'The selected copy is not available for borrowing.',
+                'copy_id' => 'The selected copy is not available for reservation.',
             ]);
         }
-
-        $allowedDays = $this->getBorrowingDays(
-            $validated['material_group'],
-            $validated['borrower_type']
-        );
-
-        $borrowedAt = now();
-        $dueAt = now()->addDays($allowedDays);
-
-        DB::table('borrow_transactions')->insert([
-            'user_id' => Auth::id(),
-            'copy_id' => $validated['copy_id'],
-            'reservation_id' => null,
-            'processed_by' => null,
-            'borrowed_at' => $borrowedAt,
-            'due_at' => $dueAt,
-            'returned_at' => null,
-            'status_id' => $this->borrowStatusId('pending'),
-            'remarks' => "Purpose: {$validated['purpose']}\nAllowed borrowing days: {$allowedDays}",
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return back()->with(
-            'success',
-            "Borrowing request submitted. Allowed borrowing period: {$allowedDays} day(s). Expected due date once approved: {$dueAt->format('M d, Y')}."
-        );
     }
 
-    private function storeBookReservation(Request $request)
-    {
-        $validated = $request->validate([
-            'resource_id' => ['required', 'exists:resources,id'],
-            'copy_id' => ['nullable', 'exists:resource_copies,id'],
-            'reservation_notes' => ['nullable', 'string', 'max:1000'],
-        ]);
+    $reservationClaimDays = 2;
 
-        if (!empty($validated['copy_id'])) {
-            $copyBelongsToResource = DB::table('resource_copies')
-                ->where('id', $validated['copy_id'])
-                ->where('resource_id', $validated['resource_id'])
-                ->exists();
+    DB::table('book_reservations')->insert([
+        'user_id' => Auth::id(),
+        'resource_id' => $validated['resource_id'],
+        'copy_id' => $validated['copy_id'] ?? null,
+        'status_id' => $this->requestStatusId('pending'),
+        'reserved_at' => now(),
+        'usage_date' => Carbon::parse($validated['usage_date']),
+        'expires_at' => now()->addDays($reservationClaimDays),
+        'approved_by' => null,
+        'processed_at' => null,
+        'claimed_at' => null,
+        'remarks' => trim(
+            "Usage date: {$validated['usage_date']}\n" .
+            "Approved reservations must be claimed within {$reservationClaimDays} day(s).\n" .
+            ($validated['reservation_notes'] ?? '')
+        ),
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
 
-            if (!$copyBelongsToResource) {
-                throw ValidationException::withMessages([
-                    'copy_id' => 'The selected copy does not belong to the selected resource.',
-                ]);
-            }
-        }
-
-        $reservationClaimDays = 2;
-
-        DB::table('book_reservations')->insert([
-            'user_id' => Auth::id(),
-            'resource_id' => $validated['resource_id'],
-            'copy_id' => $validated['copy_id'] ?? null,
-            'status_id' => $this->requestStatusId('pending'),
-            'reserved_at' => now(),
-            'expires_at' => now()->addDays($reservationClaimDays),
-            'approved_by' => null,
-            'processed_at' => null,
-            'claimed_at' => null,
-            'remarks' => trim(
-                "Approved reservations must be claimed within {$reservationClaimDays} day(s).\n" .
-                ($validated['reservation_notes'] ?? '')
-            ),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-
-        return back()->with(
-            'success',
-            "Book reservation submitted. Once approved, the book must be claimed within {$reservationClaimDays} day(s)."
-        );
-    }
+    return back()->with(
+        'success',
+        "Book reservation submitted. Once approved, the book must be claimed within {$reservationClaimDays} day(s)."
+    );
+}
 
     private function storeBookRenewal(Request $request)
     {
@@ -248,7 +268,6 @@ class ServiceController extends Controller
         $validated = $request->validate([
             'full_name' => ['nullable', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255'],
-            'library_account_number' => ['nullable', 'string', 'max:100'],
             'destination_library' => ['required', 'string', 'max:180'],
             'material_needed' => ['required', 'string', 'max:1000'],
             'request_purpose' => ['required', 'string', 'max:1000'],
@@ -273,12 +292,11 @@ class ServiceController extends Controller
             'processed_at' => null,
             'approved_letter_path' => null,
             'remarks' => trim(
-                "Requester Name: " . ($validated['full_name'] ?? 'N/A') . "\n" .
-                "Email: " . $validated['email'] . "\n" .
-                "Library Account / Student Number: " . ($validated['library_account_number'] ?? 'N/A') . "\n" .
-                "Supporting Document: " . ($supportingDocumentPath ?? 'None') . "\n" .
-                "Updates will be sent through email."
-            ),
+    "Requester Name: " . ($validated['full_name'] ?? 'N/A') . "\n" .
+    "Email: " . $validated['email'] . "\n" .
+    "Supporting Document: " . ($supportingDocumentPath ?? 'None') . "\n" .
+    "Updates will be sent through email."
+),
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -374,27 +392,73 @@ class ServiceController extends Controller
     }
 
     private function availableCopies()
-    {
-        return DB::table('resource_copies as rc')
-            ->join('resources as r', 'rc.resource_id', '=', 'r.id')
-            ->join('copy_statuses as cs', 'rc.copy_status_id', '=', 'cs.id')
-            ->leftJoin('material_types as mt', 'r.material_type_id', '=', 'mt.id')
-            ->leftJoin('categories as c', 'r.category_id', '=', 'c.id')
-            ->where('rc.is_borrowable', true)
-            ->where('cs.status_key', 'available')
-            ->select(
-    'rc.id as copy_id',
-    'r.id as resource_id',
-    'rc.accession_number',
-    'rc.barcode',
-    'r.title',
-    'r.isbn',
-    'mt.material_type_name',
-    'c.category_name'
-)
-            ->orderBy('r.title')
-            ->get();
-    }
+{
+    $authorSubquery = DB::table('resource_authors as ra')
+        ->join('authors as a', 'ra.author_id', '=', 'a.id')
+        ->select(
+            'ra.resource_id',
+            DB::raw("STRING_AGG(a.author_name, ', ') as authors")
+        )
+        ->groupBy('ra.resource_id');
+
+    $rows = DB::table('resources as r')
+        ->leftJoin('resource_copies as rc', 'r.id', '=', 'rc.resource_id')
+        ->leftJoin('copy_statuses as cs', 'rc.copy_status_id', '=', 'cs.id')
+        ->leftJoin('material_types as mt', 'r.material_type_id', '=', 'mt.id')
+        ->leftJoin('categories as c', 'r.category_id', '=', 'c.id')
+        ->leftJoinSub($authorSubquery, 'au', function ($join) {
+            $join->on('r.id', '=', 'au.resource_id');
+        })
+        ->select(
+            'r.id as resource_id',
+            'r.title',
+            'r.isbn',
+            'au.authors',
+            'mt.material_type_name',
+            'c.category_name',
+            'rc.id as copy_id',
+            'rc.accession_number',
+            'rc.barcode',
+            'rc.is_borrowable',
+            'cs.status_key',
+            'cs.status_name'
+        )
+        ->orderBy('r.title')
+        ->orderBy('rc.accession_number')
+        ->get();
+
+    return $rows->groupBy('resource_id')->map(function ($bookRows) {
+        $first = $bookRows->first();
+
+        $copies = $bookRows
+            ->filter(fn ($row) => !empty($row->copy_id))
+            ->map(function ($row) {
+                return [
+                    'copy_id' => $row->copy_id,
+                    'accession_number' => $row->accession_number,
+                    'barcode' => $row->barcode,
+                    'status_key' => $row->status_key,
+                    'status_name' => $row->status_name,
+                    'is_available' => $row->is_borrowable && $row->status_key === 'available',
+                ];
+            })
+            ->values();
+
+        $availableCopies = $copies->where('is_available', true)->values();
+
+        return (object) [
+            'resource_id' => $first->resource_id,
+            'title' => $first->title,
+            'isbn' => $first->isbn,
+            'authors' => $first->authors ?? 'Unknown Author',
+            'material_type_name' => $first->material_type_name,
+            'category_name' => $first->category_name,
+            'copies' => $copies,
+            'has_available_copies' => $availableCopies->isNotEmpty(),
+            'default_copy_id' => $availableCopies->first()['copy_id'] ?? null,
+        ];
+    })->values();
+}
 
     private function reservableResources()
     {
@@ -568,4 +632,101 @@ class ServiceController extends Controller
             ],
         ];
     }
+
+    private function borrowingHistory()
+{
+    if (!Auth::check()) {
+        return collect();
+    }
+
+    return DB::table('borrow_transactions as bt')
+        ->join('resource_copies as rc', 'bt.copy_id', '=', 'rc.id')
+        ->join('resources as r', 'rc.resource_id', '=', 'r.id')
+        ->join('borrow_statuses as bs', 'bt.status_id', '=', 'bs.id')
+        ->where('bt.user_id', Auth::id())
+        ->select(
+            'bt.id',
+            'bt.borrowed_at',
+            'bt.due_at',
+            'bt.returned_at',
+            'bs.status_name',
+            'r.title',
+            'r.isbn',
+            'rc.accession_number'
+        )
+        ->orderByDesc('bt.borrowed_at')
+        ->get();
+}
+
+public function facilityAvailability(Request $request)
+{
+    $facilityId = $request->query('facility_id');
+    $date = $request->query('date');
+
+    abort_if(!$facilityId, 422);
+
+    $slots = [
+        ['start' => '08:00', 'end' => '10:00', 'label' => '8:00am - 10:00am'],
+        ['start' => '10:00', 'end' => '12:00', 'label' => '10:00am - 12:00pm'],
+        ['start' => '13:00', 'end' => '15:00', 'label' => '1:00pm - 3:00pm'],
+        ['start' => '15:00', 'end' => '17:00', 'label' => '3:00pm - 5:00pm'],
+    ];
+
+    if ($date) {
+        $availableSlots = collect($slots)->reject(function ($slot) use ($facilityId, $date) {
+            return DB::table('facility_reservations as fr')
+                ->join('request_statuses as rs', 'fr.status_id', '=', 'rs.id')
+                ->where('fr.facility_id', $facilityId)
+                ->whereDate('fr.reservation_date', $date)
+                ->whereIn('rs.status_key', ['pending', 'approved'])
+                ->where('fr.start_time', '<', $slot['end'])
+                ->where('fr.end_time', '>', $slot['start'])
+                ->exists();
+        })->values();
+
+        return response()->json([
+            'available_slots' => $availableSlots,
+        ]);
+    }
+
+    $availableDates = collect(range(1, 14))
+        ->map(fn ($day) => now()->startOfDay()->addDays($day)->format('Y-m-d'))
+        ->filter(function ($date) use ($facilityId, $slots) {
+            foreach ($slots as $slot) {
+                $taken = DB::table('facility_reservations as fr')
+                    ->join('request_statuses as rs', 'fr.status_id', '=', 'rs.id')
+                    ->where('fr.facility_id', $facilityId)
+                    ->whereDate('fr.reservation_date', $date)
+                    ->whereIn('rs.status_key', ['pending', 'approved'])
+                    ->where('fr.start_time', '<', $slot['end'])
+                    ->where('fr.end_time', '>', $slot['start'])
+                    ->exists();
+
+                if (!$taken) {
+                    return true;
+                }
+            }
+
+            return false;
+        })
+        ->values();
+
+    return response()->json([
+        'available_dates' => $availableDates,
+    ]);
+}
+
+private function libraryBranches()
+{
+    return DB::table('library_branches')
+        ->orderBy('branch_name')
+        ->get();
+}
+
+private function materialTypes()
+{
+    return DB::table('material_types')
+        ->orderBy('material_type_name')
+        ->get();
+}
 }

@@ -18,6 +18,10 @@ import './pages/facilities.js';
 import './pages/password.js'; 
 import './pages/profile.js';
 import './pages/services.js';
+import './pages/admin-member-management.js';
+import './pages/admin-website-information.js';
+import './pages/admin-services-management.js';
+import './pages/sidebar-notification.js';
 
 import './auth/auth-background.js';
 import './auth/auth-panel.js';

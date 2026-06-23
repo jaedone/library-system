@@ -1,28 +1,4 @@
 <section class="service-workspace">
-
-    <div class="service-rules-grid">
-        <article class="service-rule-card">
-            <h2>Return Policy</h2>
-
-            <ul>
-                <li><i class="bi bi-check2-circle"></i> Materials should be returned on or before the due date.</li>
-                <li><i class="bi bi-check2-circle"></i> Returned materials will be checked by library staff.</li>
-                <li><i class="bi bi-check2-circle"></i> The return record is connected to the borrowing transaction.</li>
-                <li><i class="bi bi-check2-circle"></i> Proof of return is required for verification.</li>
-            </ul>
-        </article>
-
-        <article class="service-rule-card warning">
-            <h2>Penalties</h2>
-
-            <ul>
-                <li><i class="bi bi-exclamation-circle"></i> Overdue materials may be subject to penalties.</li>
-                <li><i class="bi bi-exclamation-circle"></i> Damaged or lost materials may require replacement or payment.</li>
-                <li><i class="bi bi-exclamation-circle"></i> Unsettled penalties may block future borrowing.</li>
-            </ul>
-        </article>
-    </div>
-
     <section class="service-form-panel">
         <div class="service-form-header">
             <span class="service-detail-eyebrow">Return Book</span>
@@ -45,42 +21,55 @@
                 <div class="service-field service-field-full">
                     <label for="borrow_transaction_id">Borrowed Book</label>
 
-                    <select id="borrow_transaction_id" name="borrow_transaction_id" required>
-                        <option value="">Select borrowed book</option>
+                    <select id="return_borrow_transaction_id" name="borrow_transaction_id" class="form-select return-book-select" required>
+    <option value="">Select borrowed book</option>
 
-                        @forelse ($activeBorrowTransactions ?? [] as $transaction)
-                            <option value="{{ $transaction->id }}">
-                                {{ $transaction->title }}
-                                — Due: {{ \Carbon\Carbon::parse($transaction->due_at)->format('M d, Y') }}
-                                — Status: {{ $transaction->status_name }}
-                            </option>
-                        @empty
-                            <option value="" disabled>No active borrowed books found</option>
-                        @endforelse
-                    </select>
+    @forelse ($activeBorrowTransactions ?? [] as $transaction)
+        <option
+            value="{{ $transaction->id }}"
+            @selected(old('borrow_transaction_id') == $transaction->id)
+        >
+            {{ $transaction->title }}
+            — Due: {{ \Carbon\Carbon::parse($transaction->due_at)->format('M d, Y') }}
+            — Status: {{ $transaction->status_name }}
+        </option>
+    @empty
+        <option value="" disabled>No active borrowed books found</option>
+    @endforelse
+</select>
                 </div>
 
                 <div class="service-field">
                     <label for="return_date">Return Date</label>
 
-                    <input
-                        type="date"
-                        id="return_date"
-                        name="return_date"
-                        required
-                    >
+                    <div class="input-group">
+    <span class="input-group-text">
+        <i class="bi bi-calendar-check"></i>
+    </span>
+
+    <input
+        type="text"
+        id="return_date"
+        name="return_date"
+        class="form-control service-date-picker"
+        value="{{ old('return_date') }}"
+        placeholder="Select return date"
+        readonly
+        required
+    >
+</div>
                 </div>
 
                 <div class="service-field">
                     <label for="material_condition">Material Condition</label>
 
-                    <select id="material_condition" name="material_condition" required>
-                        <option value="">Select condition</option>
-                        <option value="good">Good Condition</option>
-                        <option value="minor_damage">Minor Damage</option>
-                        <option value="damaged">Damaged</option>
-                        <option value="lost">Lost</option>
-                    </select>
+                    <select id="material_condition" name="material_condition" class="form-select return-condition-select" required>
+    <option value="">Select condition</option>
+    <option value="good" @selected(old('material_condition') === 'good')>Good Condition</option>
+    <option value="minor_damage" @selected(old('material_condition') === 'minor_damage')>Minor Damage</option>
+    <option value="damaged" @selected(old('material_condition') === 'damaged')>Damaged</option>
+    <option value="lost" @selected(old('material_condition') === 'lost')>Lost</option>
+</select>
                 </div>
 
                 <div class="service-field">

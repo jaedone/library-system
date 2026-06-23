@@ -1,14 +1,8 @@
-/* =========================
-   CATALOG PAGE
-========================= */
-
 .catalog-page {
     display: flex;
     flex-direction: column;
     gap: 28px;
 }
-
-/* HERO */
 
 .catalog-hero {
     min-height: 520px;
@@ -81,7 +75,6 @@
     line-height: 1.7;
 }
 
-/* SEARCH + FILTER FORM */
 
 .catalog-search-filter-form {
     width: 100%;
@@ -143,8 +136,6 @@
 .catalog-hero-search button:hover {
     background: #5a0000;
 }
-
-/* CLEAN FILTER PANEL */
 
 .catalog-filter-row {
     width: 100%;
@@ -337,4 +328,104 @@
         padding: 22px;
         border-radius: 24px;
     }
+}
+
+
+.catalog-no-results {
+    min-height: 400px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+}
+
+.catalog-no-results img {
+    max-width: 320px;
+    width: 100%;
+    height: auto;
+}
+
+.catalog-result-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    background: #fff8df;
+    color: #800000;
+
+    border: 1.5px solid rgba(128, 0, 0, 0.14);
+    border-radius: 999px;
+
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 850;
+
+    box-shadow: 0 10px 22px rgba(128, 0, 0, 0.08);
+}
+
+.catalog-result-count strong {
+    color: #800000;
+    font-weight: 950;
+}
+
+
+.catalog-client-pagination {
+    margin-top: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    flex-wrap: wrap;
+}
+
+.catalog-page-btn {
+    min-width: 42px;
+    height: 42px;
+
+    border: 1.5px solid rgba(128, 0, 0, 0.14);
+    border-radius: 999px;
+
+    background: #ffffff;
+    color: #800000;
+
+    padding: 0 16px;
+    font-size: 13px;
+    font-weight: 900;
+
+    cursor: pointer;
+    transition: 0.2s ease;
+
+    box-shadow: 0 8px 18px rgba(128, 0, 0, 0.06);
+}
+
+.catalog-page-btn:hover:not(:disabled) {
+    background: #fff3bd;
+    border-color: #daa520;
+    color: #800000;
+
+    transform: translateY(-2px);
+}
+
+.catalog-page-btn.active {
+    background: #800000;
+    border-color: #800000;
+    color: #ffffff;
+
+    box-shadow: 0 12px 24px rgba(128, 0, 0, 0.22);
+}
+
+.catalog-page-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.catalog-page-btn:first-child,
+.catalog-page-btn:last-child {
+    min-width: 92px;
 }

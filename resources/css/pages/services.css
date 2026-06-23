@@ -1,7 +1,3 @@
-/* =========================
-   SERVICES PAGE - ROULETTE ONLY
-========================= */
-
 .services-roulette-only-page {
     min-height: calc(100vh - 56px);
 }
@@ -311,7 +307,6 @@
     font-weight: 700;
 }
 
-/* Responsive */
 @media (max-width: 1100px) {
     .service-roulette-card.is-left-2,
     .service-roulette-card.is-right-2 {
@@ -382,9 +377,6 @@
     }
 }
 
-/* =========================
-   SERVICE DETAIL PAGE
-========================= */
 
 .service-detail-page {
   display: flex;
@@ -667,7 +659,6 @@
   transform: translateY(-3px);
 }
 
-/* Responsive */
 @media (max-width: 1100px) {
   .service-detail-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -702,10 +693,6 @@
     padding: 22px;
   }
 }
-
-/* =========================
-   SERVICE FORMS AND FEATURES
-========================= */
 
 .service-workspace {
     display: flex;
@@ -939,3 +926,394 @@
         padding: 22px;
     }
 }
+
+.service-field-hint {
+    display: block;
+    margin-top: 6px;
+    color: #800000;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.service-field-error {
+    display: block;
+    margin-top: 6px;
+    color: #dc3545;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.service-field input[readonly] {
+    background: #faf7f2;
+    cursor: pointer;
+}
+
+.flatpickr-calendar {
+    border-radius: 18px;
+    border: 1px solid rgba(128, 0, 0, 0.15);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+    overflow: hidden;
+}
+
+.flatpickr-months {
+    background: #800000;
+}
+
+.flatpickr-current-month,
+.flatpickr-monthDropdown-months,
+.flatpickr-current-month input.cur-year {
+    color: #ffffff !important;
+    font-weight: 900;
+}
+
+.flatpickr-weekday {
+    color: #800000 !important;
+    font-weight: 900;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+    background: #800000;
+    border-color: #800000;
+    color: #ffffff;
+}
+
+.flatpickr-day.today {
+    border-color: #daa520;
+}
+
+.flatpickr-day:hover {
+    background: #fff4cc;
+    border-color: #daa520;
+}
+
+.book-search-field {
+    position: relative;
+}
+
+
+.book-search-result-item {
+    width: 100%;
+    border: none;
+    background: #ffffff;
+    padding: 14px 16px;
+    text-align: left;
+    display: grid;
+    gap: 3px;
+    cursor: pointer;
+    transition: 0.18s ease;
+}
+
+.book-search-result-item strong {
+    color: #800000;
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.book-search-result-item span {
+    color: #3a2a28;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.book-search-result-item small,
+.book-search-empty {
+    color: #706662;
+    font-size: 12px;
+}
+
+.book-search-result-item:hover {
+    background: #fff7df;
+}
+
+.book-search-empty {
+    padding: 14px 16px;
+    font-weight: 700;
+}
+
+.book-picker-wrapper {
+    position: relative;
+}
+
+.book-search-results {
+    display: none;
+    position: absolute;
+
+    top: 100%;
+    left: 0;
+    right: 0;
+
+    margin-top: 8px;
+
+    background: #ffffff;
+    border: 1px solid rgba(128, 0, 0, 0.15);
+    border-radius: 18px;
+
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+
+    max-height: 320px;
+    overflow-y: auto;
+
+    z-index: 9999;
+}
+
+.book-search-results.is-open {
+    display: block;
+}
+.book-search-source {
+    display: none;
+}   
+
+#book_title {
+    cursor: pointer;
+}
+
+.book-search-result-item.is-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.book-search-result-item.is-disabled:hover {
+    background: #ffffff;
+}
+
+.facility-scheduler {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 24px;
+    border: 1.5px solid rgba(128, 0, 0, 0.12);
+    border-radius: 24px;
+    padding: 22px;
+    background: #ffffff;
+}
+
+.facility-calendar-box {
+    border-right: 1px solid rgba(128, 0, 0, 0.12);
+    padding-right: 28px;
+    width: 100%;
+}
+
+.facility-times-box h3 {
+    color: #800000;
+    font-size: 18px;
+    font-weight: 950;
+    margin-bottom: 16px;
+}
+
+.facility-time-slots {
+    display: grid;
+    gap: 10px;
+}
+
+.facility-time-btn {
+    width: 100%;
+    border: 1.8px solid #800000;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #800000;
+    padding: 13px 16px;
+    font-weight: 900;
+    transition: 0.2s ease;
+}
+
+.facility-time-btn:hover,
+.facility-time-btn.is-selected {
+    background: #800000;
+    color: #ffffff;
+}
+
+.facility-empty-message {
+    color: #706662;
+    font-weight: 700;
+}
+
+@media (max-width: 760px) {
+    .facility-scheduler {
+        grid-template-columns: 1fr;
+    }
+
+    .facility-calendar-box {
+        border-right: none;
+        border-bottom: 1px solid rgba(128, 0, 0, 0.12);
+        padding-right: 0;
+        padding-bottom: 20px;
+    }
+}
+
+.facility-calendar-box .flatpickr-calendar.inline {
+    width: 100%;
+    max-width: none;
+}
+
+.facility-calendar-box .flatpickr-rContainer,
+.facility-calendar-box .flatpickr-days,
+.facility-calendar-box .dayContainer {
+    width: 100%;
+    max-width: none;
+    min-width: 100%;
+}
+
+.facility-calendar-box .flatpickr-day {
+    max-width: none;
+    flex-basis: calc(100% / 7);
+}
+
+.facility-calendar-box .flatpickr-months,
+.facility-calendar-box .flatpickr-innerContainer {
+    width: 100%;
+}
+
+.reservation-success-modal {
+    border: none;
+    border-radius: 28px;
+    overflow: hidden;
+}
+
+.reservation-success-icon {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 18px;
+    border-radius: 999px;
+    background: #e8f7ee;
+    color: #198754;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+}
+
+.reservation-success-modal h3 {
+    color: #800000;
+    font-weight: 950;
+    margin-bottom: 10px;
+}
+
+.reservation-success-modal p {
+    color: #706662;
+    line-height: 1.6;
+}
+
+.reservation-success-btn {
+    margin-top: 12px;
+    border: none;
+    border-radius: 999px;
+    background: #800000;
+    padding: 11px 28px;
+    font-weight: 900;
+}
+
+.reservation-success-btn:hover {
+    background: #5a0000;
+}
+
+.reservation-success-icon.is-error {
+    background: #fdecec;
+    color: #dc3545;
+}
+
+.service-modal-error-list {
+    list-style: none;
+    padding: 0;
+    margin: 12px 0 0;
+    color: #706662;
+    display: grid;
+    gap: 6px;
+}
+
+.service-field input[type="file"] {
+    padding: 10px 14px;
+}
+
+.service-field input[type="file"]::file-selector-button {
+    border: none;
+    border-radius: 999px;
+    background: #800000;
+    color: #ffffff;
+    padding: 9px 14px;
+    margin-right: 12px;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.service-field input[type="file"]::file-selector-button:hover {
+    background: #5a0000;
+}
+
+.service-field .ts-wrapper {
+    width: 100%;
+}
+
+.service-field .ts-wrapper.single .ts-control {
+    width: 100%;
+    min-height: 50px;
+    border: 1.5px solid rgba(128, 0, 0, 0.16);
+    border-radius: 16px;
+    padding: 12px 14px;
+    background: #faf7f2;
+    color: #241312;
+    font-size: 14px;
+    box-shadow: none;
+}
+
+.service-field .ts-wrapper.focus .ts-control {
+    border-color: #800000;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(128, 0, 0, 0.08);
+}
+
+.service-field .ts-wrapper.single .ts-control .item {
+    color: #241312;
+    line-height: 1.5;
+}
+
+.service-field .ts-wrapper.single .ts-control input {
+    font-size: 14px;
+}
+
+.service-field .ts-dropdown {
+    border: 1.5px solid rgba(128, 0, 0, 0.16);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-top: 6px;
+    box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
+}
+
+.service-field .ts-dropdown .option {
+    padding: 12px 14px;
+    font-size: 14px;
+}
+
+.service-field .ts-dropdown .active {
+    background: #fff4cc;
+    color: #800000;
+}
+
+.service-field .ts-wrapper.single .ts-control {
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+
+    border: 1.5px solid rgba(128, 0, 0, 0.16);
+    border-radius: 16px;
+
+    background: #faf7f2;
+    padding: 0 14px;
+}
+
+.service-field .ts-wrapper.single .ts-control .item {
+    line-height: normal;
+}
+
+.service-field .ts-wrapper.focus .ts-control {
+    border-color: #800000;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(128, 0, 0, 0.08);
+}
+
+.service-field .ts-dropdown {
+    margin-top: 8px;
+    border-radius: 16px;
+    overflow: hidden;
+}
+

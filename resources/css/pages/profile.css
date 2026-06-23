@@ -1038,10 +1038,6 @@ button.profile-small-action {
     }
 }
 
-/* =========================
-   EMBEDDED PROFILE HERO INFO
-========================= */
-
 .profile-hero-card-embedded {
     background:
         radial-gradient(circle at 80% 22%, rgba(255, 223, 0, 0.28), transparent 30%),
@@ -1093,7 +1089,6 @@ button.profile-small-action {
     background: #ffffff;
 }
 
-/* Remove old inner-card look if this class still appears somewhere */
 .profile-main-card {
     background: transparent;
     border: none;
@@ -1102,9 +1097,6 @@ button.profile-small-action {
     box-shadow: none;
 }
 
-/* =========================
-   AVATAR HOVER UPLOAD
-========================= */
 
 .profile-photo-form {
     margin: 0;

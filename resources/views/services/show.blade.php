@@ -25,52 +25,43 @@
             <h1>{{ $service['title'] }}</h1>
 
             <p>{{ $service['description'] }}</p>
-
-            @if (!empty($service['notice']))
-                <div class="service-detail-notice">
-                    <i class="bi bi-info-circle"></i>
-                    <span>{{ $service['notice'] }}</span>
-                </div>
-            @endif
-
-            @if ($service['is_public'])
-                <div class="service-access-pill public">
-                    <i class="bi bi-unlock"></i>
-                    Available to visitors
-                </div>
-            @else
-                <div class="service-access-pill protected">
-                    <i class="bi bi-lock"></i>
-                    Sign-in required
-                </div>
-            @endif
         </div>
     </section>
 
-    {{-- SUCCESS MESSAGE --}}
-    @if (session('success'))
-        <div class="service-success-alert">
-            <i class="bi bi-check-circle"></i>
-            <span>{{ session('success') }}</span>
-        </div>
-    @endif
+    {{-- SERVICE MESSAGE POPUP --}}
+@if (session('success') || session('error') || $errors->any())
+    <div class="modal fade" id="serviceMessageModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content reservation-success-modal">
+                <div class="modal-body text-center p-5">
+                    <div class="reservation-success-icon {{ $errors->any() || session('error') ? 'is-error' : '' }}">
+                        <i class="bi {{ session('success') ? 'bi-check-circle-fill' : 'bi-exclamation-circle-fill' }}"></i>
+                    </div>
 
-    {{-- ERROR MESSAGE --}}
-    @if ($errors->any())
-        <div class="service-error-alert">
-            <i class="bi bi-exclamation-circle"></i>
+                    <h3>
+                        {{ session('success') ? 'Request Submitted!' : 'Please check the form.' }}
+                    </h3>
 
-            <div>
-                <strong>Please check the form.</strong>
+                    @if (session('success'))
+                        <p>{{ session('success') }}</p>
+                    @elseif (session('error'))
+                        <p>{{ session('error') }}</p>
+                    @else
+                        <ul class="service-modal-error-list">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
 
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+                    <button type="button" class="btn btn-primary reservation-success-btn" data-bs-dismiss="modal">
+                        Okay
+                    </button>
+                </div>
             </div>
         </div>
-    @endif
+    </div>
+@endif
 
     {{-- SERVICE SPECIFIC PAGE --}}
     @include('services.pages.' . $serviceKey)

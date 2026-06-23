@@ -1,14 +1,8 @@
-/* =========================
-   HOME PAGE
-========================= */
-
 .home-page {
     display: flex;
     flex-direction: column;
     gap: 28px;
 }
-
-/* HERO */
 
 .home-hero {
     min-height: 330px;
@@ -144,8 +138,6 @@
     margin-bottom: 8px;
 }
 
-/* REMINDER */
-
 .home-reminder {
     background: #800000;
     color: #ffdf00;
@@ -158,7 +150,6 @@
     gap: 12px;
 }
 
-/* SECTIONS */
 
 .home-section {
     background: #ffffff;
@@ -203,7 +194,6 @@
     color: #daa520;
 }
 
-/* ANNOUNCEMENTS */
 
 .announcement-grid {
     display: grid;
@@ -250,8 +240,6 @@
     line-height: 1.6;
     margin: 0;
 }
-
-/* SERVICES */
 
 .services-grid {
     display: grid;
@@ -301,7 +289,6 @@
     color: #ffffff;
 }
 
-/* BOOK TABS */
 
 .home-book-tabs {
     gap: 12px;

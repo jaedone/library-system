@@ -1,28 +1,4 @@
 <section class="service-workspace">
-
-    <div class="service-rules-grid">
-        <article class="service-rule-card">
-            <h2>Renewal Conditions</h2>
-
-            <ul>
-                <li><i class="bi bi-check2-circle"></i> The material must be renewable.</li>
-                <li><i class="bi bi-check2-circle"></i> The material must not be reserved by another user.</li>
-                <li><i class="bi bi-check2-circle"></i> The borrower must have no pending penalties.</li>
-                <li><i class="bi bi-check2-circle"></i> Renewal is connected to an active borrowing record.</li>
-            </ul>
-        </article>
-
-        <article class="service-rule-card warning">
-            <h2>Important Reminder</h2>
-
-            <ul>
-                <li><i class="bi bi-info-circle"></i> Renewal requests may be rejected if the book is overdue.</li>
-                <li><i class="bi bi-info-circle"></i> Renewal approval depends on library policy and material availability.</li>
-                <li><i class="bi bi-info-circle"></i> Requested renewal date must be later than today.</li>
-            </ul>
-        </article>
-    </div>
-
     <section class="service-form-panel">
         <div class="service-form-header">
             <span class="service-detail-eyebrow">Renew Book</span>
@@ -37,30 +13,43 @@
                 <div class="service-field service-field-full">
                     <label for="borrow_transaction_id">Borrowed Book</label>
 
-                    <select id="borrow_transaction_id" name="borrow_transaction_id" required>
-                        <option value="">Select borrowed book</option>
+                    <select id="borrow_transaction_id" name="borrow_transaction_id" class="form-select renewal-book-select" required>
+    <option value="">Select borrowed book</option>
 
-                        @forelse ($activeBorrowTransactions ?? [] as $transaction)
-                            <option value="{{ $transaction->id }}">
-                                {{ $transaction->title }}
-                                — Due: {{ \Carbon\Carbon::parse($transaction->due_at)->format('M d, Y') }}
-                                — Status: {{ $transaction->status_name }}
-                            </option>
-                        @empty
-                            <option value="" disabled>No active borrowed books found</option>
-                        @endforelse
-                    </select>
+    @forelse ($activeBorrowTransactions ?? [] as $transaction)
+        <option
+            value="{{ $transaction->id }}"
+            @selected(old('borrow_transaction_id') == $transaction->id)
+        >
+            {{ $transaction->title }}
+            — Due: {{ \Carbon\Carbon::parse($transaction->due_at)->format('M d, Y') }}
+            — Status: {{ $transaction->status_name }}
+        </option>
+    @empty
+        <option value="" disabled>No active borrowed books found</option>
+    @endforelse
+</select>
                 </div>
 
                 <div class="service-field">
                     <label for="requested_renewal_date">Requested New Due Date</label>
 
-                    <input
-                        type="date"
-                        id="requested_renewal_date"
-                        name="requested_renewal_date"
-                        required
-                    >
+                    <div class="input-group">
+    <span class="input-group-text">
+        <i class="bi bi-calendar-check"></i>
+    </span>
+
+    <input
+        type="text"
+        id="requested_renewal_date"
+        name="requested_renewal_date"
+        class="form-control service-date-picker"
+        value="{{ old('requested_renewal_date') }}"
+        placeholder="Select new due date"
+        readonly
+        required
+    >
+</div>
                 </div>
 
                 <div class="service-field service-field-full">

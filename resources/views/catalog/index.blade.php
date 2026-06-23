@@ -11,7 +11,7 @@
         initialSearch: @js(request('q', ''))
     })"
 >
-    {{-- CATALOG HERO --}}
+
     <section
         class="catalog-hero"
         style="--catalog-bg: url('{{ asset('images/auth-bg/bg5.jpg') }}');"
@@ -145,7 +145,6 @@
         </div>
     </section>
 
-    {{-- RESULTS SECTION --}}
     <section class="catalog-results-section home-section" id="catalogResults">
         <div class="home-section-header catalog-results-header">
             <div>
@@ -183,23 +182,10 @@
             </div>
         </div>
 
-        {{-- NO RESULTS --}}
         <div x-show="filteredResults.length === 0" x-cloak class="catalog-no-results">
             <img src="{{ asset('images/no-results.gif') }}" alt="No results found">
-
-            <h3>No results found</h3>
-
-            <p>
-                No resources matched
-                "<span x-text="search || isbn || 'your filters'"></span>".
-            </p>
-
-            <button type="button" class="catalog-filter-btn" @click="clearFilters()">
-                Clear Filters
-            </button>
         </div>
 
-        {{-- KEEP OLD RESOURCE CARD UI --}}
         <div x-show="filteredResults.length > 0" x-cloak class="catalog-results-grid">
             @foreach ($resources as $resource)
                 <div
@@ -216,7 +202,6 @@
             @endforeach
         </div>
 
-        {{-- CLIENT-SIDE PAGINATION --}}
         <div class="catalog-client-pagination" x-show="totalPages > 1" x-cloak>
             <button
                 type="button"

@@ -55,18 +55,22 @@
         </div>
 
         <div class="announcement-grid">
-            @foreach ($announcements as $announcement)
-            <article class="announcement-card">
-                <div class="announcement-icon">
-                    <i class="bi {{ $announcement['icon'] }}"></i>
-                </div>
+    @foreach ($announcements as $announcement)
+        <article class="announcement-card">
+            <div class="announcement-icon">
+                @if (!empty($announcement->image_path))
+                    <img src="{{ asset($announcement->image_path) }}" alt="{{ $announcement->title }}">
+                @else
+                    <i class="bi {{ $announcement->icon ?? 'bi-megaphone' }}"></i>
+                @endif
+            </div>
 
-                <h3>{{ $announcement['title'] }}</h3>
+            <h3>{{ $announcement->title }}</h3>
 
-                <p>{{ $announcement['description'] }}</p>
-            </article>
-            @endforeach
-        </div>
+            <p>{{ $announcement->description }}</p>
+        </article>
+    @endforeach
+</div>
     </section>
 
     {{-- SERVICES OFFERED --}}

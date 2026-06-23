@@ -2,7 +2,10 @@
     <div class="overlay">
 
         <div class="overlay-panel overlay-left">
-            <span class="stamp">Returning patron</span>
+            <img
+                src="{{ asset('images/Iconnic.png') }}"
+                alt="PUP Library Logo"
+                style="width: 160px; height: auto; margin-bottom: 24px;">
 
             <h2>Welcome back</h2>
 
@@ -16,7 +19,10 @@
         </div>
 
         <div class="overlay-panel overlay-right">
-            <span class="stamp">First visit</span>
+            <img
+                src="{{ asset('images/Iconnic.png') }}"
+                alt="PUP Library Logo"
+                style="width: 160px; height: auto; margin-bottom: 24px;">
 
             <h2>Hello, friend</h2>
 

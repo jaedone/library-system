@@ -3,6 +3,7 @@
 
 @import './layout/sidebar.css';
 @import './layout/footer.css';
+@import './layout/adminSidePanel.css';
 
 @import './components/resource-card.css';
 @import './components/book-details-panel.css';
@@ -14,3 +15,7 @@
 @import './pages/facilities.css';
 @import './pages/profile.css';
 @import './pages/password.css';
+@import './pages/admin-member-management.css'; 
+@import './pages/admin-website-information.css';
+@import './pages/admin-services-management.css';
+@import './pages/sidebar-notification.css';
