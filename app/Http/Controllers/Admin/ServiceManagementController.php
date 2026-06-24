@@ -30,12 +30,8 @@ class ServiceManagementController extends Controller
         $search        = strtolower(trim($request->query('search', '')));
 
         $requests = $this->collectRequests()
-            ->when($serviceFilter, function ($collection) use ($serviceFilter) {
-                return $collection->where('service_key', $serviceFilter);
-            })
-            ->when($statusFilter, function ($collection) use ($statusFilter) {
-                return $collection->where('status_key', $statusFilter);
-            })
+            ->when($serviceFilter, fn($collection) => $collection->where('service_key', $serviceFilter))
+            ->when($statusFilter, fn($collection) => $collection->where('status_key', $statusFilter))
             ->when($search !== '', function ($collection) use ($search) {
                 return $collection->filter(function ($item) use ($search) {
                     return str_contains(strtolower($item->requester_name ?? ''), $search)
@@ -46,12 +42,11 @@ class ServiceManagementController extends Controller
                 });
             })
             ->sortByDesc('requested_at')
+            ->take(50)
             ->values();
 
         $panelRequests = $requests
-            ->map(function ($item) {
-                return $this->buildPanelItem($item);
-            })
+            ->map(fn($item) => $this->buildPanelItem($item, false))
             ->values();
 
         return view('admin.services.index', [
@@ -65,6 +60,341 @@ class ServiceManagementController extends Controller
                 ? DB::table('penalty_types')->orderBy('penalty_type_name')->get()
                 : collect(),
         ]);
+    }
+
+    private function collectRequests()
+    {
+        return collect()
+            ->concat($this->bookBorrowingRequests())
+            ->concat($this->bookReservationRequests())
+            ->concat($this->facilityReservationRequests())
+            ->concat($this->bookRenewalRequests())
+            ->concat($this->bookReturnRequests())
+            ->concat($this->referralLetterRequests())
+            ->values();
+    }
+
+    private function buildPanelItem(object $item, bool $includeUserContext = false): array
+    {
+        return [
+            'id'              => $item->request_id,
+            'service_key'     => $item->service_key,
+            'service_label'   => $item->service_label,
+            'title'           => $item->title,
+            'subtitle'        => $item->subtitle ?? '',
+            'status_key'      => $item->status_key,
+            'status_name'     => $item->status_name,
+            'requester_name'  => $item->requester_name,
+            'requester_email' => $item->requester_email,
+            'requested_at'    => $item->requested_at,
+            'raw_remarks'     => $item->raw_remarks,
+            'details'         => (array) $item,
+
+            'user_context' => $includeUserContext && $item->user_id
+                ? $this->userContext((int) $item->user_id)
+                : $this->emptyUserContext($item),
+
+            'availability' => $includeUserContext
+                ? $this->availabilityContext($item)
+                : $this->basicAvailabilityContext($item),
+        ];
+    }
+
+    private function emptyUserContext(object $item): array
+    {
+        return [
+            'credit_score' => [
+                'current_score' => 'N/A',
+                'level_name' => $item->user_id ? 'Not loaded' : 'Guest Requester',
+                'description' => $item->user_id
+                    ? 'User account context is not loaded on the list page for performance.'
+                    : 'This request was submitted without an account.',
+            ],
+            'active_borrowed_books' => [],
+            'past_borrowed_books' => [],
+            'active_reservations' => [],
+            'outstanding_penalties' => [],
+        ];
+    }
+
+    private function basicAvailabilityContext(object $item): array
+    {
+        return [
+            'type' => 'general',
+            'message' => 'Availability check is available during approval.',
+        ];
+    }
+
+    private function bookBorrowingRequests()
+    {
+        if (!Schema::hasTable('borrow_transactions')) {
+            return collect();
+        }
+
+        return DB::table('borrow_transactions as bt')
+            ->join('users as u', 'bt.user_id', '=', 'u.id')
+            ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
+            ->join('resource_copies as rc', 'bt.copy_id', '=', 'rc.id')
+            ->join('resources as r', 'rc.resource_id', '=', 'r.id')
+            ->join('borrow_statuses as bs', 'bt.status_id', '=', 'bs.id')
+            ->select(
+                'bt.id as request_id',
+                'bt.user_id',
+                'u.email as requester_email',
+                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email) as requester_name"),
+                DB::raw("'book-borrowing' as service_key"),
+                DB::raw("'Book Borrowing' as service_label"),
+                'r.title',
+                'r.isbn',
+                'rc.id as copy_id',
+                'rc.accession_number',
+                'bt.borrowed_at as requested_at',
+                'bt.due_at',
+                'bs.status_key',
+                'bs.status_name',
+                'bt.remarks as raw_remarks',
+                DB::raw("'borrow_transactions' as request_table")
+            )
+            ->orderByDesc('bt.created_at')
+            ->limit(50)
+            ->get()
+            ->map(function ($item) {
+                $item->subtitle = 'Accession: ' . ($item->accession_number ?? 'N/A');
+                return $item;
+            });
+    }
+
+    private function bookReservationRequests()
+    {
+        if (!Schema::hasTable('book_reservations')) {
+            return collect();
+        }
+
+        return DB::table('book_reservations as br')
+            ->join('users as u', 'br.user_id', '=', 'u.id')
+            ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
+            ->join('resources as r', 'br.resource_id', '=', 'r.id')
+            ->join('request_statuses as rs', 'br.status_id', '=', 'rs.id')
+            ->leftJoin('resource_copies as rc', 'br.copy_id', '=', 'rc.id')
+            ->select(
+                'br.id as request_id',
+                'br.user_id',
+                'u.email as requester_email',
+                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email) as requester_name"),
+                DB::raw("'book-reservation' as service_key"),
+                DB::raw("'Book Reservation' as service_label"),
+                'r.id as resource_id',
+                'r.title',
+                'r.isbn',
+                'br.copy_id',
+                'rc.accession_number',
+                'br.reserved_at as requested_at',
+                'br.expires_at',
+                'rs.status_key',
+                'rs.status_name',
+                'br.remarks as raw_remarks',
+                DB::raw("'book_reservations' as request_table")
+            )
+            ->orderByDesc('br.created_at')
+            ->limit(50)
+            ->get()
+            ->map(function ($item) {
+                $item->subtitle = 'Claim until: ' . ($item->expires_at ?? 'N/A');
+                return $item;
+            });
+    }
+
+    private function facilityReservationRequests()
+    {
+        if (!Schema::hasTable('facility_reservations')) {
+            return collect();
+        }
+
+        return DB::table('facility_reservations as fr')
+            ->join('users as u', 'fr.user_id', '=', 'u.id')
+            ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
+            ->join('facilities as f', 'fr.facility_id', '=', 'f.id')
+            ->join('request_statuses as rs', 'fr.status_id', '=', 'rs.id')
+            ->select(
+                'fr.id as request_id',
+                'fr.user_id',
+                'u.email as requester_email',
+                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email) as requester_name"),
+                DB::raw("'facility-reservation' as service_key"),
+                DB::raw("'Facility Reservation' as service_label"),
+                'f.id as facility_id',
+                'f.facility_name as title',
+                'f.capacity',
+                'fr.reservation_date',
+                'fr.start_time',
+                'fr.end_time',
+                'fr.participants_count',
+                'fr.created_at as requested_at',
+                'fr.purpose',
+                'rs.status_key',
+                'rs.status_name',
+                'fr.remarks as raw_remarks',
+                DB::raw("'facility_reservations' as request_table")
+            )
+            ->orderByDesc('fr.created_at')
+            ->limit(50)
+            ->get()
+            ->map(function ($item) {
+                $item->subtitle = $item->reservation_date . ' • ' . $item->start_time . ' - ' . $item->end_time;
+                return $item;
+            });
+    }
+
+    private function bookRenewalRequests()
+    {
+        if (!Schema::hasTable('renewal_requests')) {
+            return collect();
+        }
+
+        return DB::table('renewal_requests as rr')
+            ->join('users as u', 'rr.user_id', '=', 'u.id')
+            ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
+            ->join('borrow_transactions as bt', 'rr.borrow_transaction_id', '=', 'bt.id')
+            ->join('resource_copies as rc', 'bt.copy_id', '=', 'rc.id')
+            ->join('resources as r', 'rc.resource_id', '=', 'r.id')
+            ->join('request_statuses as rs', 'rr.status_id', '=', 'rs.id')
+            ->select(
+                'rr.id as request_id',
+                'rr.user_id',
+                'u.email as requester_email',
+                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email) as requester_name"),
+                DB::raw("'book-renewal' as service_key"),
+                DB::raw("'Book Renewal' as service_label"),
+                'rr.borrow_transaction_id',
+                'bt.copy_id',
+                'rc.resource_id',
+                'r.title',
+                'r.isbn',
+                'rc.accession_number',
+                'bt.due_at',
+                'rr.new_due_at',
+                'rr.requested_at',
+                'rs.status_key',
+                'rs.status_name',
+                'rr.remarks as raw_remarks',
+                DB::raw("'renewal_requests' as request_table")
+            )
+            ->orderByDesc('rr.created_at')
+            ->limit(50)
+            ->get()
+            ->map(function ($item) {
+                $item->subtitle = 'Requested new due date: ' . ($item->new_due_at ?? 'N/A');
+                return $item;
+            });
+    }
+
+    private function bookReturnRequests()
+    {
+        if (!Schema::hasTable('book_return_requests')) {
+            return collect();
+        }
+
+        return DB::table('book_return_requests as brr')
+            ->join('users as u', 'brr.user_id', '=', 'u.id')
+            ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
+            ->join('borrow_transactions as bt', 'brr.borrow_transaction_id', '=', 'bt.id')
+            ->join('resource_copies as rc', 'bt.copy_id', '=', 'rc.id')
+            ->join('resources as r', 'rc.resource_id', '=', 'r.id')
+            ->join('request_statuses as rs', 'brr.status_id', '=', 'rs.id')
+            ->select(
+                'brr.id as request_id',
+                'brr.user_id',
+                'u.email as requester_email',
+                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email) as requester_name"),
+                DB::raw("'book-return' as service_key"),
+                DB::raw("'Book Return' as service_label"),
+                'brr.borrow_transaction_id',
+                'bt.copy_id',
+                'r.title',
+                'r.isbn',
+                'rc.accession_number',
+                'bt.due_at',
+                'brr.returned_at',
+                'brr.material_condition',
+                'brr.proof_path',
+                'brr.created_at as requested_at',
+                'rs.status_key',
+                'rs.status_name',
+                'brr.remarks as raw_remarks',
+                DB::raw("'book_return_requests' as request_table")
+            )
+            ->orderByDesc('brr.created_at')
+            ->limit(50)
+            ->get()
+            ->map(function ($item) {
+                $item->subtitle = 'Condition: ' . ucfirst(str_replace('_', ' ', $item->material_condition ?? 'N/A'));
+                return $item;
+            });
+    }
+
+    private function referralLetterRequests()
+    {
+        if (!Schema::hasTable('referral_requests')) {
+            return collect();
+        }
+
+        return DB::table('referral_requests as rr')
+            ->leftJoin('users as u', 'rr.user_id', '=', 'u.id')
+            ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
+            ->join('request_statuses as rs', 'rr.status_id', '=', 'rs.id')
+            ->select(
+                'rr.id as request_id',
+                'rr.user_id',
+                DB::raw("COALESCE(u.email, 'Guest requester') as requester_email"),
+                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email, 'Guest requester') as requester_name"),
+                DB::raw("'referral-letter' as service_key"),
+                DB::raw("'Referral Letter' as service_label"),
+                'rr.destination_library as title',
+                'rr.material_needed',
+                'rr.purpose',
+                'rr.approved_letter_path',
+                'rr.requested_at',
+                'rs.status_key',
+                'rs.status_name',
+                'rr.remarks as raw_remarks',
+                DB::raw("'referral_requests' as request_table")
+            )
+            ->orderByDesc('rr.created_at')
+            ->limit(50)
+            ->get()
+            ->map(function ($item) {
+                $item->subtitle = 'Material needed: ' . ($item->material_needed ?? 'N/A');
+                return $item;
+            });
+    }
+
+    private function findServiceRequest(string $serviceKey, int $requestId): object
+    {
+        $record = $this->collectRequests()
+            ->first(function ($item) use ($serviceKey, $requestId) {
+                return $item->service_key === $serviceKey
+                    && (int) $item->request_id === (int) $requestId;
+            });
+
+        abort_if(!$record, 404);
+
+        return $record;
+    }
+
+    private function respond(Request $request, string $message, string $serviceKey, int $requestId)
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'item' => $this->buildPanelItem(
+                    $this->findServiceRequest($serviceKey, $requestId),
+                    true
+                ),
+            ]);
+        }
+
+        return back()->with('success', $message);
     }
 
     public function review(Request $request, string $serviceKey, int $requestId)
@@ -378,283 +708,6 @@ class ServiceManagementController extends Controller
         return $this->respond($request, 'Referral letter update sent to user notification inbox.', $serviceKey, $requestId);
     }
 
-    private function collectRequests()
-    {
-        return collect()
-            ->concat($this->bookBorrowingRequests())
-            ->concat($this->bookReservationRequests())
-            ->concat($this->facilityReservationRequests())
-            ->concat($this->bookRenewalRequests())
-            ->concat($this->bookReturnRequests())
-            ->concat($this->referralLetterRequests())
-            ->values();
-    }
-
-    private function bookBorrowingRequests()
-    {
-        if (!Schema::hasTable('borrow_transactions')) {
-            return collect();
-        }
-
-        return DB::table('borrow_transactions as bt')
-            ->join('users as u', 'bt.user_id', '=', 'u.id')
-            ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
-            ->join('resource_copies as rc', 'bt.copy_id', '=', 'rc.id')
-            ->join('resources as r', 'rc.resource_id', '=', 'r.id')
-            ->join('borrow_statuses as bs', 'bt.status_id', '=', 'bs.id')
-            ->select(
-                'bt.id as request_id',
-                'bt.user_id',
-                'u.email as requester_email',
-                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email) as requester_name"),
-                DB::raw("'book-borrowing' as service_key"),
-                DB::raw("'Book Borrowing' as service_label"),
-                'r.title',
-                'r.isbn',
-                'rc.id as copy_id',
-                'rc.accession_number',
-                'bt.borrowed_at as requested_at',
-                'bt.due_at',
-                'bs.status_key',
-                'bs.status_name',
-                'bt.remarks as raw_remarks',
-                DB::raw("'borrow_transactions' as request_table")
-            )
-            ->orderByDesc('bt.created_at')
-            ->get()
-            ->map(function ($item) {
-                $item->subtitle = 'Accession: ' . ($item->accession_number ?? 'N/A');
-                return $item;
-            });
-    }
-
-    private function bookReservationRequests()
-    {
-        if (!Schema::hasTable('book_reservations')) {
-            return collect();
-        }
-
-        return DB::table('book_reservations as br')
-            ->join('users as u', 'br.user_id', '=', 'u.id')
-            ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
-            ->join('resources as r', 'br.resource_id', '=', 'r.id')
-            ->join('request_statuses as rs', 'br.status_id', '=', 'rs.id')
-            ->leftJoin('resource_copies as rc', 'br.copy_id', '=', 'rc.id')
-            ->select(
-                'br.id as request_id',
-                'br.user_id',
-                'u.email as requester_email',
-                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email) as requester_name"),
-                DB::raw("'book-reservation' as service_key"),
-                DB::raw("'Book Reservation' as service_label"),
-                'r.id as resource_id',
-                'r.title',
-                'r.isbn',
-                'br.copy_id',
-                'rc.accession_number',
-                'br.reserved_at as requested_at',
-                'br.expires_at',
-                'rs.status_key',
-                'rs.status_name',
-                'br.remarks as raw_remarks',
-                DB::raw("'book_reservations' as request_table")
-            )
-            ->orderByDesc('br.created_at')
-            ->get()
-            ->map(function ($item) {
-                $item->subtitle = 'Claim until: ' . ($item->expires_at ?? 'N/A');
-                return $item;
-            });
-    }
-
-    private function facilityReservationRequests()
-    {
-        if (!Schema::hasTable('facility_reservations')) {
-            return collect();
-        }
-
-        return DB::table('facility_reservations as fr')
-            ->join('users as u', 'fr.user_id', '=', 'u.id')
-            ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
-            ->join('facilities as f', 'fr.facility_id', '=', 'f.id')
-            ->join('request_statuses as rs', 'fr.status_id', '=', 'rs.id')
-            ->select(
-                'fr.id as request_id',
-                'fr.user_id',
-                'u.email as requester_email',
-                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email) as requester_name"),
-                DB::raw("'facility-reservation' as service_key"),
-                DB::raw("'Facility Reservation' as service_label"),
-                'f.id as facility_id',
-                'f.facility_name as title',
-                'f.capacity',
-                'fr.reservation_date',
-                'fr.start_time',
-                'fr.end_time',
-                'fr.participants_count',
-                'fr.created_at as requested_at',
-                'fr.purpose',
-                'rs.status_key',
-                'rs.status_name',
-                'fr.remarks as raw_remarks',
-                DB::raw("'facility_reservations' as request_table")
-            )
-            ->orderByDesc('fr.created_at')
-            ->get()
-            ->map(function ($item) {
-                $item->subtitle = $item->reservation_date . ' • ' . $item->start_time . ' - ' . $item->end_time;
-                return $item;
-            });
-    }
-
-    private function bookRenewalRequests()
-    {
-        if (!Schema::hasTable('renewal_requests')) {
-            return collect();
-        }
-
-        return DB::table('renewal_requests as rr')
-            ->join('users as u', 'rr.user_id', '=', 'u.id')
-            ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
-            ->join('borrow_transactions as bt', 'rr.borrow_transaction_id', '=', 'bt.id')
-            ->join('resource_copies as rc', 'bt.copy_id', '=', 'rc.id')
-            ->join('resources as r', 'rc.resource_id', '=', 'r.id')
-            ->join('request_statuses as rs', 'rr.status_id', '=', 'rs.id')
-            ->select(
-                'rr.id as request_id',
-                'rr.user_id',
-                'u.email as requester_email',
-                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email) as requester_name"),
-                DB::raw("'book-renewal' as service_key"),
-                DB::raw("'Book Renewal' as service_label"),
-                'rr.borrow_transaction_id',
-                'bt.copy_id',
-                'rc.resource_id',
-                'r.title',
-                'r.isbn',
-                'rc.accession_number',
-                'bt.due_at',
-                'rr.new_due_at',
-                'rr.requested_at',
-                'rs.status_key',
-                'rs.status_name',
-                'rr.remarks as raw_remarks',
-                DB::raw("'renewal_requests' as request_table")
-            )
-            ->orderByDesc('rr.created_at')
-            ->get()
-            ->map(function ($item) {
-                $item->subtitle = 'Requested new due date: ' . ($item->new_due_at ?? 'N/A');
-                return $item;
-            });
-    }
-
-    private function bookReturnRequests()
-    {
-        if (!Schema::hasTable('book_return_requests')) {
-            return collect();
-        }
-
-        return DB::table('book_return_requests as brr')
-            ->join('users as u', 'brr.user_id', '=', 'u.id')
-            ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
-            ->join('borrow_transactions as bt', 'brr.borrow_transaction_id', '=', 'bt.id')
-            ->join('resource_copies as rc', 'bt.copy_id', '=', 'rc.id')
-            ->join('resources as r', 'rc.resource_id', '=', 'r.id')
-            ->join('request_statuses as rs', 'brr.status_id', '=', 'rs.id')
-            ->select(
-                'brr.id as request_id',
-                'brr.user_id',
-                'u.email as requester_email',
-                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email) as requester_name"),
-                DB::raw("'book-return' as service_key"),
-                DB::raw("'Book Return' as service_label"),
-                'brr.borrow_transaction_id',
-                'bt.copy_id',
-                'r.title',
-                'r.isbn',
-                'rc.accession_number',
-                'bt.due_at',
-                'brr.returned_at',
-                'brr.material_condition',
-                'brr.proof_path',
-                'brr.created_at as requested_at',
-                'rs.status_key',
-                'rs.status_name',
-                'brr.remarks as raw_remarks',
-                DB::raw("'book_return_requests' as request_table")
-            )
-            ->orderByDesc('brr.created_at')
-            ->get()
-            ->map(function ($item) {
-                $item->subtitle = 'Condition: ' . ucfirst(str_replace('_', ' ', $item->material_condition ?? 'N/A'));
-                return $item;
-            });
-    }
-
-    private function referralLetterRequests()
-    {
-        if (!Schema::hasTable('referral_requests')) {
-            return collect();
-        }
-
-        return DB::table('referral_requests as rr')
-            ->leftJoin('users as u', 'rr.user_id', '=', 'u.id')
-            ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
-            ->join('request_statuses as rs', 'rr.status_id', '=', 'rs.id')
-            ->select(
-                'rr.id as request_id',
-                'rr.user_id',
-                DB::raw("COALESCE(u.email, 'Guest requester') as requester_email"),
-                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email, 'Guest requester') as requester_name"),
-                DB::raw("'referral-letter' as service_key"),
-                DB::raw("'Referral Letter' as service_label"),
-                'rr.destination_library as title',
-                'rr.material_needed',
-                'rr.purpose',
-                'rr.approved_letter_path',
-                'rr.requested_at',
-                'rs.status_key',
-                'rs.status_name',
-                'rr.remarks as raw_remarks',
-                DB::raw("'referral_requests' as request_table")
-            )
-            ->orderByDesc('rr.created_at')
-            ->get()
-            ->map(function ($item) {
-                $item->subtitle = 'Material needed: ' . ($item->material_needed ?? 'N/A');
-                return $item;
-            });
-    }
-
-    private function buildPanelItem(object $item): array
-    {
-        return [
-            'id'             => $item->request_id,
-            'service_key'    => $item->service_key,
-            'service_label'  => $item->service_label,
-            'title'          => $item->title,
-            'subtitle'       => $item->subtitle ?? '',
-            'status_key'     => $item->status_key,
-            'status_name'    => $item->status_name,
-            'requester_name' => $item->requester_name,
-            'requester_email' => $item->requester_email,
-            'requested_at'   => $item->requested_at,
-            'raw_remarks'    => $item->raw_remarks,
-            'details'        => (array) $item,
-            'user_context' => $item->user_id
-                ? $this->userContext((int) $item->user_id)
-                : [
-                    'credit_score' => null,
-                    'active_borrowed_books' => [],
-                    'past_borrowed_books' => [],
-                    'active_reservations' => [],
-                    'outstanding_penalties' => [],
-                ],
-            'availability'   => $this->availabilityContext($item),
-        ];
-    }
-
     private function userContext(int $userId): array
     {
         return [
@@ -713,19 +766,6 @@ class ServiceManagementController extends Controller
             'type'    => 'general',
             'message' => 'No special availability warning.',
         ];
-    }
-
-    private function findServiceRequest(string $serviceKey, int $requestId): object
-    {
-        $record = $this->collectRequests()
-            ->first(function ($item) use ($serviceKey, $requestId) {
-                return $item->service_key === $serviceKey
-                    && (int) $item->request_id === (int) $requestId;
-            });
-
-        abort_if(!$record, 404);
-
-        return $record;
     }
 
     private function approveBookBorrowing(object $record, string $remarks): void
@@ -879,19 +919,6 @@ class ServiceManagementController extends Controller
             'created_at'    => now(),
             'updated_at'    => now(),
         ]);
-    }
-
-    private function respond(Request $request, string $message, string $serviceKey, int $requestId)
-    {
-        if ($request->expectsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'item'    => $this->buildPanelItem($this->findServiceRequest($serviceKey, $requestId)),
-            ]);
-        }
-
-        return back()->with('success', $message);
     }
 
     private function requestStatusId(string $statusKey): int
