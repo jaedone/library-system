@@ -259,9 +259,9 @@ body.sidebar-collapsed .sidebar-account-dropdown .sidebar-dropdown {
     z-index: 99999;
 }
 
+
 .library-sidebar {
-    overflow-y: auto;
-    overflow-x: visible;
+    overflow: visible !important;
 }
 
 body.sidebar-collapsed .sidebar-account-dropdown {
@@ -519,3 +519,106 @@ body.sidebar-collapsed .library-main {
     }
 }
 
+.sidebar-account-dropdown {
+    position: relative;
+}
+
+.sidebar-account-dropdown .dropdown-menu {
+    position: absolute !important;
+    left: 250px !important;
+    right: auto !important;
+    transform: none !important;
+    z-index: 999999 !important;
+}
+
+
+.sidebar-menu {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+
+.sidebar-account-area {
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 99999;
+}
+
+.sidebar-account-dropdown .dropdown-menu.sidebar-dropdown {
+    width: 360px;
+    min-width: 360px;
+    padding: 0 !important;
+    border: 1px solid rgba(128, 0, 0, 0.12) !important;
+    border-radius: 24px !important;
+    background: #ffffff;
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.18) !important;
+    overflow: hidden;
+}
+
+.sidebar-dropdown-user {
+    background: #faf7f2;
+    border-bottom: 1px solid rgba(128, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.sidebar-dropdown-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 16px;
+    background: #800000;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex: 0 0 auto;
+}
+
+.sidebar-dropdown-user span {
+    display: block;
+    color: #706662;
+    font-size: 12px;
+    font-weight: 850;
+}
+
+.sidebar-dropdown-user strong {
+    display: block;
+    color: #251817;
+    font-size: 14px;
+    font-weight: 950;
+    word-break: break-word;
+}
+
+.sidebar-dropdown-item {
+    color: #251817 !important;
+    font-size: 14px;
+    font-weight: 850 !important;
+    min-height: 46px;
+}
+
+.sidebar-dropdown-item i {
+    color: #800000;
+    font-size: 18px;
+}
+
+.sidebar-dropdown-item:hover {
+    background: #faf7f2 !important;
+    color: #800000 !important;
+}
+
+.sidebar-dropdown-item.danger {
+    color: #9f1239 !important;
+}
+
+.sidebar-dropdown-item.danger i {
+    color: #9f1239;
+}
+
+.sidebar-dropdown-item.danger:hover {
+    background: #fff5f5 !important;
+    color: #9f1239 !important;
+}

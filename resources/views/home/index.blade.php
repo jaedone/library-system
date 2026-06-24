@@ -40,8 +40,7 @@
                     title="PUP Library Video"
                     frameborder="0"
                     allow="autoplay; encrypted-media; picture-in-picture; web-share"
-                    allowfullscreen
-                ></iframe>
+                    allowfullscreen></iframe>
             </div>
         </div>
     </section>
@@ -55,22 +54,22 @@
         </div>
 
         <div class="announcement-grid">
-    @foreach ($announcements as $announcement)
-        <article class="announcement-card">
-            <div class="announcement-icon">
-                @if (!empty($announcement->image_path))
+            @foreach ($announcements as $announcement)
+            <article class="announcement-card">
+                <div class="announcement-icon">
+                    @if (!empty($announcement->image_path))
                     <img src="{{ asset($announcement->image_path) }}" alt="{{ $announcement->title }}">
-                @else
+                    @else
                     <i class="bi {{ $announcement->icon ?? 'bi-megaphone' }}"></i>
-                @endif
-            </div>
+                    @endif
+                </div>
 
-            <h3>{{ $announcement->title }}</h3>
+                <h3>{{ $announcement->title }}</h3>
 
-            <p>{{ $announcement->description }}</p>
-        </article>
-    @endforeach
-</div>
+                <p>{{ $announcement->description }}</p>
+            </article>
+            @endforeach
+        </div>
     </section>
 
     {{-- SERVICES OFFERED --}}
@@ -145,9 +144,9 @@
                 <div class="books-grid">
                     @forelse ($newArrivals as $book)
                     @include('common.resource-card', [
-                        'resource' => $book,
-                        'variant' => 'compact',
-                        'borrowBlockReason' => $borrowBlockReason ?? null
+                    'resource' => $book,
+                    'variant' => 'compact',
+                    'borrowBlockReason' => $borrowBlockReason ?? null
                     ])
                     @empty
                     <p class="empty-message">No new books available yet.</p>
@@ -159,9 +158,9 @@
                 <div class="books-grid">
                     @forelse ($mostBorrowed as $book)
                     @include('common.resource-card', [
-                        'resource' => $book,
-                        'variant' => 'compact',
-                        'borrowBlockReason' => $borrowBlockReason ?? null
+                    'resource' => $book,
+                    'variant' => 'compact',
+                    'borrowBlockReason' => $borrowBlockReason ?? null
                     ])
                     @empty
                     <p class="empty-message">No borrowing records yet.</p>
@@ -173,9 +172,9 @@
                 <div class="books-grid">
                     @forelse ($recommendedBooks as $book)
                     @include('common.resource-card', [
-                        'resource' => $book,
-                        'variant' => 'compact',
-                        'borrowBlockReason' => $borrowBlockReason ?? null
+                    'resource' => $book,
+                    'variant' => 'compact',
+                    'borrowBlockReason' => $borrowBlockReason ?? null
                     ])
                     @empty
                     <p class="empty-message">No recommended books available yet.</p>
@@ -188,34 +187,38 @@
 </section>
 
 @php
-    $bookDetailsResources = collect($newArrivals)
-        ->concat($mostBorrowed)
-        ->concat($recommendedBooks)
-        ->unique('id')
-        ->values()
-        ->map(function ($book) {
-            return [
-                'id' => $book->id,
-                'title' => $book->title ?? 'Untitled Resource',
-                'isbn' => $book->isbn ?? 'N/A',
-                'description' => $book->description ?? 'No description available.',
-                'cover_url' => !empty($book->cover_image_path)
-                    ? asset('storage/' . $book->cover_image_path)
-                    : asset('images/default-book-cover.png'),
-                'publication_year' => $book->publication_year ?? 'N/A',
-                'category_name' => $book->category_name ?? 'N/A',
-                'material_type_name' => $book->material_type_name ?? 'Library Material',
-                'authors' => $book->authors ?? 'Unknown Author',
-                'library_locations' => $book->library_locations ?? 'No location assigned',
-                'availability_statuses' => $book->availability_statuses ?? 'No copies available',
-                'total_copies' => $book->total_copies ?? 0,
-                'available_copies' => $book->available_copies ?? 0,
-            ];
-        });
+$bookDetailsResources = collect($newArrivals)
+->concat($mostBorrowed)
+->concat($recommendedBooks)
+->unique('id')
+->values()
+->map(function ($book) {
+return [
+'id' => $book->id,
+'title' => $book->title ?? 'Untitled Resource',
+'isbn' => $book->isbn ?? 'N/A',
+'description' => $book->description ?? 'No description available.',
+'cover_url' => !empty($book->cover_image_path)
+? (\Illuminate\Support\Str::startsWith($book->cover_image_path, ['http://', 'https://'])
+? $book->cover_image_path
+: (\Illuminate\Support\Str::startsWith($book->cover_image_path, ['storage/'])
+? asset($book->cover_image_path)
+: asset('storage/' . $book->cover_image_path)))
+: asset('images/auth-bg/bg4.jpg'),
+'publication_year' => $book->publication_year ?? 'N/A',
+'category_name' => $book->category_name ?? 'N/A',
+'material_type_name' => $book->material_type_name ?? 'Library Material',
+'authors' => $book->authors ?? 'Unknown Author',
+'library_locations' => $book->library_locations ?? 'No location assigned',
+'availability_statuses' => $book->availability_statuses ?? 'No copies available',
+'total_copies' => $book->total_copies ?? 0,
+'available_copies' => $book->available_copies ?? 0,
+];
+});
 @endphp
 
 @include('common.book-details-panel', [
-    'bookDetailsResources' => $bookDetailsResources,
+'bookDetailsResources' => $bookDetailsResources,
 ])
 
 @endsection
