@@ -1,50 +1,81 @@
-<div data-roles="alumni">
+<div data-roles="visitor">
 
     <div class="field">
-        <label for="alumni_id_number">Alumni ID number</label>
+        <label for="institution">
+            Institution / School / Organization
+        </label>
 
         <input
             type="text"
-            id="alumni_id_number"
-            name="alumni_id_number"
-            value="{{ old('alumni_id_number') }}"
-            placeholder="Enter your alumni ID number"
+            id="institution"
+            name="institution"
+            value="{{ old('institution') }}"
+            placeholder="e.g. De La Salle University"
         >
     </div>
 
     <div class="field">
-        <label for="graduated_program">Graduated Program</label>
+        <label for="research_topic">
+            Research Topic
+        </label>
 
         <input
             type="text"
-            id="graduated_program"
-            name="graduated_program"
-            value="{{ old('graduated_program') }}"
-            placeholder="e.g. Bachelor of Science in Computer Science"
+            id="research_topic"
+            name="research_topic"
+            value="{{ old('research_topic') }}"
+            placeholder="Enter your research topic"
         >
     </div>
 
     <div class="field">
-        <label for="graduation_year">Graduation Year</label>
+        <label for="intended_visit_date">
+            Intended Visit Date
+        </label>
 
         <input
-            type="number"
-            id="graduation_year"
-            name="graduation_year"
-            value="{{ old('graduation_year') }}"
-            min="1900"
-            max="{{ date('Y') }}"
-            placeholder="e.g. 2024"
+            type="date"
+            id="intended_visit_date"
+            name="intended_visit_date"
+            value="{{ old('intended_visit_date') }}"
         >
     </div>
 
     <div class="field">
-        <label for="alumni_id_file">Alumni ID / Valid ID</label>
+        <label for="purpose_of_visit">
+            Purpose of Visit
+        </label>
+
+        <textarea
+            id="purpose_of_visit"
+            name="purpose_of_visit"
+            rows="4"
+            placeholder="Explain your purpose for visiting the library"
+        >{{ old('purpose_of_visit') }}</textarea>
+    </div>
+
+    <div class="field">
+        <label for="referral_letter_file">
+            Referral Letter
+        </label>
 
         <input
             type="file"
-            id="alumni_id_file"
-            name="alumni_id_file"
+            id="referral_letter_file"
+            name="referral_letter_file"
+            accept=".pdf,.jpg,.jpeg,.png"
+        >
+    </div>
+
+    <div class="field">
+        <label for="valid_id_file">
+            Valid ID
+        </label>
+
+        <input
+            type="file"
+            id="valid_id_file"
+            name="valid_id_file"
             accept=".pdf,.jpg,.jpeg,.png"
         >
     </div>
