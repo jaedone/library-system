@@ -153,7 +153,7 @@ class ServiceManagementController extends Controller
                 ->where('id', $requestId)
                 ->update([
                     'status_id'   => $this->borrowStatusId('rejected'),
-                    'processed_by'=> Auth::id(),
+                    'processed_by' => Auth::id(),
                     'remarks'     => $this->appendRemarks($record->raw_remarks, $remarks),
                     'updated_at'  => now(),
                 ]);
@@ -599,14 +599,14 @@ class ServiceManagementController extends Controller
         }
 
         return DB::table('referral_requests as rr')
-            ->join('users as u', 'rr.user_id', '=', 'u.id')
+            ->leftJoin('users as u', 'rr.user_id', '=', 'u.id')
             ->leftJoin('user_profiles as up', 'u.id', '=', 'up.user_id')
             ->join('request_statuses as rs', 'rr.status_id', '=', 'rs.id')
             ->select(
                 'rr.id as request_id',
                 'rr.user_id',
-                'u.email as requester_email',
-                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email) as requester_name"),
+                DB::raw("COALESCE(u.email, 'Guest requester') as requester_email"),
+                DB::raw("COALESCE(NULLIF(TRIM(CONCAT(up.first_name, ' ', up.last_name)), ''), u.email, 'Guest requester') as requester_name"),
                 DB::raw("'referral-letter' as service_key"),
                 DB::raw("'Referral Letter' as service_label"),
                 'rr.destination_library as title',
@@ -638,11 +638,19 @@ class ServiceManagementController extends Controller
             'status_key'     => $item->status_key,
             'status_name'    => $item->status_name,
             'requester_name' => $item->requester_name,
-            'requester_email'=> $item->requester_email,
+            'requester_email' => $item->requester_email,
             'requested_at'   => $item->requested_at,
             'raw_remarks'    => $item->raw_remarks,
             'details'        => (array) $item,
-            'user_context'   => $this->userContext((int) $item->user_id),
+            'user_context' => $item->user_id
+                ? $this->userContext((int) $item->user_id)
+                : [
+                    'credit_score' => null,
+                    'active_borrowed_books' => [],
+                    'past_borrowed_books' => [],
+                    'active_reservations' => [],
+                    'outstanding_penalties' => [],
+                ],
             'availability'   => $this->availabilityContext($item),
         ];
     }
@@ -651,10 +659,10 @@ class ServiceManagementController extends Controller
     {
         return [
             'credit_score'         => $this->creditScore($userId),
-            'active_borrowed_books'=> $this->activeBorrowedBooks($userId),
+            'active_borrowed_books' => $this->activeBorrowedBooks($userId),
             'past_borrowed_books'  => $this->pastBorrowedBooks($userId),
             'active_reservations'  => $this->activeReservations($userId),
-            'outstanding_penalties'=> $this->outstandingPenalties($userId),
+            'outstanding_penalties' => $this->outstandingPenalties($userId),
         ];
     }
 
@@ -686,15 +694,15 @@ class ServiceManagementController extends Controller
 
             $activeReservations = DB::table('book_reservations as br')
                 ->join('request_statuses as rs', 'br.status_id', '=', 'rs.id')
-                ->when($copyId, fn ($query) => $query->where('br.copy_id', $copyId))
-                ->when(!$copyId && $resourceId, fn ($query) => $query->where('br.resource_id', $resourceId))
+                ->when($copyId, fn($query) => $query->where('br.copy_id', $copyId))
+                ->when(!$copyId && $resourceId, fn($query) => $query->where('br.resource_id', $resourceId))
                 ->where('br.user_id', '!=', $item->user_id)
                 ->whereIn('rs.status_key', ['pending', 'approved'])
                 ->count();
 
             return [
                 'type'               => 'book',
-                'active_reservations'=> $activeReservations,
+                'active_reservations' => $activeReservations,
                 'message'            => $activeReservations > 0
                     ? 'This book has active reservations from other users.'
                     : 'No active reservation conflict found.',
@@ -1007,7 +1015,7 @@ class ServiceManagementController extends Controller
             ->where('user_id', $userId)
             ->update([
                 'current_score'        => $newScore,
-                'credit_score_level_id'=> $levelId ?: $score->credit_score_level_id,
+                'credit_score_level_id' => $levelId ?: $score->credit_score_level_id,
                 'updated_at'           => now(),
             ]);
     }
