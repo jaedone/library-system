@@ -37,6 +37,25 @@ Route::get('/facilities', [FacilityController::class, 'index'])
 Route::get('/search', [SiteSearchController::class, 'redirect'])
     ->name('site.search');
 
+Route::get('/services/referral-letter', [ServiceController::class, 'show'])
+    ->name('services.referral-letter')
+    ->defaults('service', 'referral-letter');
+
+Route::post('/services/referral-letter', [ServiceController::class, 'store'])
+    ->name('services.referral-letter.store')
+    ->defaults('service', 'referral-letter');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/services/facility-availability', [ServiceController::class, 'facilityAvailability'])
+        ->name('services.facility-availability');
+
+    Route::get('/services/{service}', [ServiceController::class, 'show'])
+        ->name('services.show');
+
+    Route::post('/services/{service}', [ServiceController::class, 'store'])
+        ->name('services.store');
+});
+
 Route::middleware('auth')->group(function () {
     Route::get('/account/profile', [ProfileController::class, 'show'])
         ->name('account.profile');
@@ -52,15 +71,6 @@ Route::middleware('auth')->group(function () {
 
     Route::put('/account/profile/photo', [ProfileController::class, 'updatePhoto'])
         ->name('account.profile.photo.update');
-
-    Route::get('/services/facility-availability', [ServiceController::class, 'facilityAvailability'])
-        ->name('services.facility-availability');
-
-    Route::get('/services/{service}', [ServiceController::class, 'show'])
-        ->name('services.show');
-
-    Route::post('/services/{service}', [ServiceController::class, 'store'])
-        ->name('services.store');
 });
 
 

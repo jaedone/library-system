@@ -457,8 +457,12 @@
                 'isbn' => $book->isbn ?? 'N/A',
                 'description' => $book->description ?? 'No description available.',
                 'cover_url' => !empty($book->cover_image_path)
-                    ? asset('storage/' . $book->cover_image_path)
-                    : asset('images/default-book-cover.png'),
+                ? (\Illuminate\Support\Str::startsWith($book->cover_image_path, ['http://', 'https://'])
+                    ? $book->cover_image_path
+                    : (\Illuminate\Support\Str::startsWith($book->cover_image_path, ['storage/'])
+                        ? asset($book->cover_image_path)
+                        : asset('storage/' . $book->cover_image_path)))
+                : asset('images/auth-bg/bg4.jpg'),
                 'publication_year' => $book->publication_year ?? 'N/A',
                 'category_name' => $book->category_name ?? 'N/A',
                 'material_type_name' => $book->material_type_name ?? 'Library Material',

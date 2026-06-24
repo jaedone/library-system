@@ -55,8 +55,12 @@ class CatalogController extends Controller
                     'available_copies' => $resource->available_copies,
 
                     'cover_url' => !empty($resource->cover_image_path)
-                        ? $resource->cover_image_path
-                        : asset('images/Iconnic.png'),
+                        ? (\Illuminate\Support\Str::startsWith($resource->cover_image_path, ['http://', 'https://'])
+                            ? $resource->cover_image_path
+                            : (\Illuminate\Support\Str::startsWith($resource->cover_image_path, ['storage/'])
+                                ? asset($resource->cover_image_path)
+                                : asset('storage/' . $resource->cover_image_path)))
+                        : asset('images/auth-bg/bg4.jpg'),
                 ];
             })
             ->values();
