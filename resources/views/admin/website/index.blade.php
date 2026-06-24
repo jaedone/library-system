@@ -434,13 +434,11 @@
 </section>
 
 <script type="application/json" data-website-data>
-    {
-        !!json_encode([
-            'announcement' => $announcements,
-            'resource' => $resources,
-            'facility' => $facilities,
-        ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!
-    }
+{!! json_encode([
+    'announcement' => $announcements,
+    'resource' => $resources,
+    'facility' => $facilities,
+], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}
 </script>
 
 @endsection
