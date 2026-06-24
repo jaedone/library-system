@@ -67,5 +67,5 @@
 </aside>
 
 <script type="application/json" data-book-details-json>
-{!! json_encode($bookDetailsResources ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}
+{!! json_encode($catalogResources ?? [], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}
 </script>

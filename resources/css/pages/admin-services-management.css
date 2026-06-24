@@ -408,3 +408,40 @@
     min-height: 0;
     overflow-y: auto;
 }
+
+.admin-services-management-page .admin-push-panel {
+    position: fixed !important;
+    top: 18px;
+    right: 18px;
+    bottom: 18px;
+    width: min(520px, calc(100vw - 36px));
+    max-height: calc(100vh - 36px);
+    overflow: hidden;
+    z-index: 999;
+}
+
+.admin-services-management-page .admin-push-panel-inner {
+    height: 100%;
+    max-height: calc(100vh - 36px);
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.admin-services-management-page .admin-push-panel-top {
+    flex: 0 0 auto;
+}
+
+.admin-services-management-page .admin-push-panel-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 6px;
+}
+
+.admin-services-management-page .admin-push-panel-footer {
+    flex: 0 0 auto;
+}

@@ -259,6 +259,11 @@ body.sidebar-collapsed .sidebar-account-dropdown .sidebar-dropdown {
     z-index: 99999;
 }
 
+.library-sidebar {
+    overflow-y: auto;
+    overflow-x: visible;
+}
+
 body.sidebar-collapsed .sidebar-account-dropdown {
     width: 100%;
 }

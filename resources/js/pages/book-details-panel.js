@@ -64,18 +64,14 @@ document.addEventListener('DOMContentLoaded', function () {
             reserve.href = `/services/book-reservation?resource_id=${resource.id}`;
         }
 
-        overlay.hidden = false;
         panel.classList.add('is-open');
         panel.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('book-details-open');
     }
 
     function closePanel() {
-        panel.classList.remove('is-open');
-        panel.setAttribute('aria-hidden', 'true');
-        overlay.hidden = true;
-        document.body.classList.remove('book-details-open');
-    }
+    panel.classList.remove('is-open');
+    panel.setAttribute('aria-hidden', 'true');
+}
 
     document.addEventListener('click', function (event) {
         const button = event.target.closest('[data-book-details-id]');

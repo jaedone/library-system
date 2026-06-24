@@ -37,31 +37,34 @@
 
                     <div class="admin-website-list" data-card-list="announcement">
                         @forelse ($announcements as $announcement)
-                            <div
-                                class="admin-website-item"
-                                data-item-row="announcement-{{ $announcement->id }}"
-                                data-search-text="{{ Str::lower($announcement->title . ' ' . $announcement->description) }}"
-                            >
-                                <div class="admin-website-item-main">
-                                    <i class="bi bi-megaphone"></i>
+                        <div
+                            class="admin-website-item"
+                            data-item-row="announcement-{{ $announcement->id }}"
+                            data-search-text="{{ Str::lower($announcement->title . ' ' . $announcement->description) }}">
+                            <div class="admin-website-item-main">
+                                <i class="bi bi-megaphone"></i>
 
-                                    <div>
-                                        <strong>{{ $announcement->title }}</strong>
-                                        <span>{{ $announcement->is_archived ? 'Archived' : 'Visible' }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="admin-website-item-actions">
-                                    <button type="button" data-website-action="view" data-module="announcement" data-id="{{ $announcement->id }}">View</button>
-                                    <button type="button" data-website-action="edit" data-module="announcement" data-id="{{ $announcement->id }}">Update</button>
-                                    <button type="button" data-website-action="archive" data-module="announcement" data-id="{{ $announcement->id }}">
-                                        {{ $announcement->is_archived ? 'Restore' : 'Archive' }}
-                                    </button>
-                                    <button type="button" data-website-action="delete" data-module="announcement" data-id="{{ $announcement->id }}">Delete</button>
+                                <div>
+                                    <strong>{{ $announcement->title }}</strong>
+                                    <span>{{ $announcement->is_archived ? 'Archived' : 'Visible' }}</span>
                                 </div>
                             </div>
+
+                            <button type="button" class="admin-website-more-btn">
+                                <i class="bi bi-three-dots-vertical"></i>
+                            </button>
+
+                            <div class="admin-website-item-actions">
+                                <button type="button" data-website-action="view" data-module="announcement" data-id="{{ $announcement->id }}">View</button>
+                                <button type="button" data-website-action="edit" data-module="announcement" data-id="{{ $announcement->id }}">Update</button>
+                                <button type="button" data-website-action="archive" data-module="announcement" data-id="{{ $announcement->id }}">
+                                    {{ $announcement->is_archived ? 'Restore' : 'Archive' }}
+                                </button>
+                                <button type="button" data-website-action="delete" data-module="announcement" data-id="{{ $announcement->id }}">Delete</button>
+                            </div>
+                        </div>
                         @empty
-                            <p class="admin-empty-text">No announcements yet.</p>
+                        <p class="admin-empty-text">No announcements yet.</p>
                         @endforelse
                     </div>
 
@@ -89,33 +92,32 @@
 
                     <div class="admin-website-list" data-card-list="resource">
                         @forelse ($resources as $resource)
-                            <div
-                                class="admin-website-item"
-                                data-item-row="resource-{{ $resource->id }}"
-                                data-search-text="{{ Str::lower($resource->title . ' ' . ($resource->authors ?? '') . ' ' . ($resource->isbn ?? '') . ' ' . ($resource->material_type_name ?? '')) }}"
-                            >
-                                <div class="admin-website-item-main">
-                                    <i class="bi bi-book"></i>
+                        <div
+                            class="admin-website-item"
+                            data-item-row="resource-{{ $resource->id }}"
+                            data-search-text="{{ Str::lower($resource->title . ' ' . ($resource->authors ?? '') . ' ' . ($resource->isbn ?? '') . ' ' . ($resource->material_type_name ?? '')) }}">
+                            <div class="admin-website-item-main">
+                                <i class="bi bi-book"></i>
 
-                                    <div>
-                                        <strong>{{ $resource->title }}</strong>
-                                        <span>
-                                            {{ $resource->is_archived ? 'Archived' : ($resource->material_type_name ?? 'Library Material') }}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <div class="admin-website-item-actions">
-                                    <button type="button" data-website-action="view" data-module="resource" data-id="{{ $resource->id }}">View</button>
-                                    <button type="button" data-website-action="edit" data-module="resource" data-id="{{ $resource->id }}">Update</button>
-                                    <button type="button" data-website-action="archive" data-module="resource" data-id="{{ $resource->id }}">
-                                        {{ $resource->is_archived ? 'Restore' : 'Archive' }}
-                                    </button>
-                                    <button type="button" data-website-action="delete" data-module="resource" data-id="{{ $resource->id }}">Delete</button>
+                                <div>
+                                    <strong>{{ $resource->title }}</strong>
+                                    <span>
+                                        {{ $resource->is_archived ? 'Archived' : ($resource->material_type_name ?? 'Library Material') }}
+                                    </span>
                                 </div>
                             </div>
+
+                            <div class="admin-website-item-actions">
+                                <button type="button" data-website-action="view" data-module="resource" data-id="{{ $resource->id }}">View</button>
+                                <button type="button" data-website-action="edit" data-module="resource" data-id="{{ $resource->id }}">Update</button>
+                                <button type="button" data-website-action="archive" data-module="resource" data-id="{{ $resource->id }}">
+                                    {{ $resource->is_archived ? 'Restore' : 'Archive' }}
+                                </button>
+                                <button type="button" data-website-action="delete" data-module="resource" data-id="{{ $resource->id }}">Delete</button>
+                            </div>
+                        </div>
                         @empty
-                            <p class="admin-empty-text">No resources yet.</p>
+                        <p class="admin-empty-text">No resources yet.</p>
                         @endforelse
                     </div>
 
@@ -143,31 +145,30 @@
 
                     <div class="admin-website-list" data-card-list="facility">
                         @forelse ($facilities as $facility)
-                            <div
-                                class="admin-website-item"
-                                data-item-row="facility-{{ $facility->id }}"
-                                data-search-text="{{ Str::lower($facility->facility_name . ' ' . ($facility->description ?? '') . ' ' . ($facility->location ?? '')) }}"
-                            >
-                                <div class="admin-website-item-main">
-                                    <i class="bi bi-building"></i>
+                        <div
+                            class="admin-website-item"
+                            data-item-row="facility-{{ $facility->id }}"
+                            data-search-text="{{ Str::lower($facility->facility_name . ' ' . ($facility->description ?? '') . ' ' . ($facility->location ?? '')) }}">
+                            <div class="admin-website-item-main">
+                                <i class="bi bi-building"></i>
 
-                                    <div>
-                                        <strong>{{ $facility->facility_name }}</strong>
-                                        <span>{{ $facility->is_archived ? 'Archived' : 'Visible' }}</span>
-                                    </div>
-                                </div>
-
-                                <div class="admin-website-item-actions">
-                                    <button type="button" data-website-action="view" data-module="facility" data-id="{{ $facility->id }}">View</button>
-                                    <button type="button" data-website-action="edit" data-module="facility" data-id="{{ $facility->id }}">Update</button>
-                                    <button type="button" data-website-action="archive" data-module="facility" data-id="{{ $facility->id }}">
-                                        {{ $facility->is_archived ? 'Restore' : 'Archive' }}
-                                    </button>
-                                    <button type="button" data-website-action="delete" data-module="facility" data-id="{{ $facility->id }}">Delete</button>
+                                <div>
+                                    <strong>{{ $facility->facility_name }}</strong>
+                                    <span>{{ $facility->is_archived ? 'Archived' : 'Visible' }}</span>
                                 </div>
                             </div>
+
+                            <div class="admin-website-item-actions">
+                                <button type="button" data-website-action="view" data-module="facility" data-id="{{ $facility->id }}">View</button>
+                                <button type="button" data-website-action="edit" data-module="facility" data-id="{{ $facility->id }}">Update</button>
+                                <button type="button" data-website-action="archive" data-module="facility" data-id="{{ $facility->id }}">
+                                    {{ $facility->is_archived ? 'Restore' : 'Archive' }}
+                                </button>
+                                <button type="button" data-website-action="delete" data-module="facility" data-id="{{ $facility->id }}">Delete</button>
+                            </div>
+                        </div>
                         @empty
-                            <p class="admin-empty-text">No facilities yet.</p>
+                        <p class="admin-empty-text">No facilities yet.</p>
                         @endforelse
                     </div>
 
@@ -255,7 +256,7 @@
                                         <select name="material_type_id" data-field="material_type_id">
                                             <option value="">Select material type</option>
                                             @foreach ($materialTypes as $type)
-                                                <option value="{{ $type->id }}">{{ $type->material_type_name }}</option>
+                                            <option value="{{ $type->id }}">{{ $type->material_type_name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -265,7 +266,7 @@
                                         <select name="category_id" data-field="category_id">
                                             <option value="">Select category</option>
                                             @foreach ($categories as $category)
-                                                <option value="{{ $category->id }}">{{ $category->category_name }}</option>
+                                            <option value="{{ $category->id }}">{{ $category->category_name }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -329,36 +330,34 @@
                                 </div>
 
                                 <div class="admin-form-grid two">
-    <div class="admin-field">
-        <label>Available Dates</label>
+                                    <div class="admin-field">
+                                        <label>Available Dates</label>
 
-        <div class="input-group admin-date-group">
-            <span class="input-group-text">
-                <i class="bi bi-calendar-check"></i>
-            </span>
+                                        <div class="input-group admin-date-group">
+                                            <span class="input-group-text">
+                                                <i class="bi bi-calendar-check"></i>
+                                            </span>
 
-            <input
-                type="text"
-                name="availability_days"
-                class="form-control facility-available-dates-picker"
-                data-field="availability_days"
-                placeholder="Select available dates"
-                readonly
-            >
-        </div>
-    </div>
+                                            <input
+                                                type="text"
+                                                name="availability_days"
+                                                class="form-control facility-available-dates-picker"
+                                                data-field="availability_days"
+                                                placeholder="Select available dates"
+                                                readonly>
+                                        </div>
+                                    </div>
 
-    <div class="admin-field">
-        <label>Availability Hours</label>
+                                    <div class="admin-field">
+                                        <label>Availability Hours</label>
 
-        <input
-            type="text"
-            name="availability_hours"
-            data-field="availability_hours"
-            placeholder="Example: 8:00 AM to 5:00 PM"
-        >
-    </div>
-</div>
+                                        <input
+                                            type="text"
+                                            name="availability_hours"
+                                            data-field="availability_hours"
+                                            placeholder="Example: 8:00 AM to 5:00 PM">
+                                    </div>
+                                </div>
 
                                 <div class="admin-field">
                                     <label>Equipment</label>
@@ -378,15 +377,15 @@
 
                             <div class="admin-panel-divider"></div>
 
-<div class="admin-push-preview-card">
-    <span class="admin-eyebrow">Live Preview</span>
-    <div data-live-preview-output></div>
-</div>
+                            <div class="admin-push-preview-card">
+                                <span class="admin-eyebrow">Live Preview</span>
+                                <div data-live-preview-output></div>
+                            </div>
 
-<button type="submit" class="admin-primary-btn">
-    <i class="bi bi-save"></i>
-    Save Changes
-</button>
+                            <button type="submit" class="admin-primary-btn">
+                                <i class="bi bi-save"></i>
+                                Save Changes
+                            </button>
                         </form>
                     </section>
 
@@ -435,11 +434,13 @@
 </section>
 
 <script type="application/json" data-website-data>
-{!! json_encode([
-    'announcement' => $announcements,
-    'resource' => $resources,
-    'facility' => $facilities,
-], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!}
+    {
+        !!json_encode([
+            'announcement' => $announcements,
+            'resource' => $resources,
+            'facility' => $facilities,
+        ], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT) !!
+    }
 </script>
 
 @endsection

@@ -1,59 +1,338 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<div align="center">
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# 📚 PUP Library Management System
 
-## About Laravel
+### Polytechnic University of the Philippines – Library and Learning Resource Center
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" />
+<img src="https://img.shields.io/badge/PHP-8.2-777BB4?style=for-the-badge&logo=php&logoColor=white" />
+<img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
+<img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" />
+<img src="https://img.shields.io/badge/Bootstrap-5-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white" />
+<img src="https://img.shields.io/badge/Vite-Build-646CFF?style=for-the-badge&logo=vite&logoColor=white" />
+<img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge" />
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<br><br>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+> Electronic Library Resource Management, Borrowing, Reservation, and Service Platform for the Polytechnic University of the Philippines.
 
-## Learning Laravel
+</div>
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# Overview
 
-## Laravel Sponsors
+The **PUP Library Management System** is a web-based platform designed to streamline library operations and improve access to academic resources within the Polytechnic University of the Philippines.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+The system enables students, faculty, employees, alumni, and visitors to efficiently search, borrow, reserve, and access library services while providing administrators with powerful tools for managing resources, users, and transactions.
 
-### Premium Partners
+---
+<div align="center">
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# System Preview
 
-## Contributing
+</div>
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Home Page
 
-## Code of Conduct
+![Home Demo](public/images/demo/home.png)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Catalog Page
 
-## Security Vulnerabilities
+![Catalog Demo](public/images/demo/catalog.png)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Services Page
 
-## License
+![Borrow Demo](public/images/demo/services.png)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Facilities Page
+
+![Facility Demo](public/images/demo/facilities.png)
+
+## Authentication Page
+
+![Authentication Demo](public/images/demo/authentication.png)
+
+---
+<div align="center">
+
+# Features
+
+</div>
+
+##  Resource Catalog
+
+- Catalog searching
+- Resource availability tracking
+- Material categorization
+- Author and ISBN searching
+- Publication year filtering
+- Location filtering
+- Digital resource access
+
+## User Management
+
+- Student Accounts
+- Faculty Accounts
+- Employee Accounts
+- Alumni Accounts
+- Visitor Accounts
+
+## Administrative Dashboard
+
+- User Management
+- Resource Management
+- Service Management
+- Transaction Monitoring
+
+## Library Services
+
+- **Book Borrowing** – Allows users to request and borrow available library materials.
+- **Book Reservation** – Lets users reserve resources and claim them within the allowed claiming period.
+- **Book Renewal** – Allows eligible users to extend their borrowing period.
+- **Book Return** – Supports return processing and updates copy availability.
+- **Facility Reservation** – Enables users to reserve library facilities and rooms.
+- **Online Resources** – Provides access to digital or online library materials.
+- **Referral Letter Request** – Allows users to request referral letters for other library branches.
+- **Service Request Processing** – Allows staff to review, approve, or reject submitted requests.
+- **Request Status Tracking** – Lets users monitor the status of their submitted library requests.
+
+---
+<div align="center">
+
+# System Architecture
+
+
+```text
+┌────────────────────────────┐
+│        Frontend UI         │
+│ Blade + Bootstrap + JS     │
+└────────────┬───────────────┘
+             │
+             ▼
+┌────────────────────────────┐
+│     Laravel Controllers    │
+│ Authentication / Catalog   │
+│ Borrowing / Reservation    │
+└────────────┬───────────────┘
+             │
+             ▼
+┌────────────────────────────┐
+│      Business Logic        │
+│ Services & Validation      │
+└────────────┬───────────────┘
+             │
+             ▼
+┌────────────────────────────┐
+│      PostgreSQL DB         │
+│         Supabase           │
+│ Users / Resources / Copies │
+│ Transactions / Services    │
+└────────────────────────────┘
+
+```
+
+# Database Design
+
+</div>
+
+### Core Tables
+
+```sql
+users
+roles
+account_statuses
+
+resources
+authors
+resource_authors
+
+resource_copies
+copy_statuses
+
+borrow_transactions
+reservations
+penalties
+
+categories
+material_types
+locations
+```
+
+### Main Relationships
+
+```text
+Users
+ │
+ ├── Borrow Transactions
+ ├── Reservations
+ │
+Resources
+ │
+ ├── Resource Copies
+ ├── Authors
+ │
+ └── Categories
+```
+
+---
+<div align="center">
+
+# User Roles
+
+
+| Role | Permissions |
+|--------|-------------|
+| Student | Search, Borrow, Reserve, Services |
+| Faculty | Search, Borrow, Reserve, Services |
+| Employee | Search, Borrow, Reserve, Services |
+| Staff | Manage Resources, Users, and Transactions |
+
+---
+
+# Technology Stack
+
+| Technology | Purpose |
+|------------|---------|
+| Laravel 12 | Backend Framework |
+| PHP 8.2 | Server-side Programming |
+| PostgreSQL (Supabase) | Database |
+| Bootstrap 5 | User Interface |
+| JavaScript | Frontend Interactivity |
+| Vite | Asset Bundling |
+| Railway | Deployment Platform |
+
+---
+
+# Installation
+
+</div>
+
+## Clone Repository
+
+```bash
+git clone https://github.com/jaedone/library-system.git
+
+cd library-system
+```
+
+## Install Dependencies
+
+```bash
+composer install
+
+npm install
+```
+
+## Configure Environment
+
+```bash
+cp .env.example .env
+```
+
+Update your database credentials:
+
+```env
+request the credentials to the student developers
+```
+
+## Generate Application Key
+
+```bash
+php artisan key:generate
+```
+
+## Run Migrations
+
+```bash
+php artisan migrate
+```
+
+## Build Frontend Assets
+
+Development:
+
+```bash
+npm run dev
+```
+
+Production:
+
+```bash
+npm run build
+```
+
+## Start Application
+
+```bash
+php artisan serve
+```
+
+---
+
+<div align="center">
+
+# Security Features
+
+</div>
+
+- Password Hashing
+- CSRF Protection
+- Input Validation
+- Session Authentication
+- Role-Based Access Control
+- Authorization Middleware
+- Protected Administrative Routes
+
+---
+
+<div align="center">
+
+# Future Enhancements
+
+</div>
+
+- RFID Integration
+- QR Code Borrowing
+- Email Notifications
+- SMS Notifications
+- Mobile Application
+- Analytics Dashboard
+- AI-Based Book Recommendations
+- Automated Fine Computation
+
+---
+
+<div align="center">
+
+# Development Team
+
+</div>
+
+### BS Computer Science Students
+
+**Polytechnic University of the Philippines**
+
+| Member | Role |
+|----------|--------|
+| Mark Joseph B. Neypes | Developer |
+| Princess Izzy Dancal | Quality Assurance |
+| Samantha Salmorin | UI Designer |
+| John Paul Asuzano | UI Designer |
+
+---
+
+<div align="center">
+
+# License / Project Use
+
+</div>
+
+This project was developed for academic purposes as part of our Web Development course under the Bachelor of Science in Computer Science program at the Polytechnic University of the Philippines.
+
+
+<div align="center">
+
+Made with ❤️ by Team 1 Group 4 of BSCS 3-5
+
+</div>

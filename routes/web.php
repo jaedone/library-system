@@ -31,14 +31,11 @@ Route::get('/catalog', [CatalogController::class, 'index'])->name('catalog.index
 Route::get('/services', [ServiceController::class, 'index'])
     ->name('services.index');
 
-Route::get('/services/{service}', [ServiceController::class, 'show'])
-    ->name('services.show');
-
-Route::post('/services/{service}', [ServiceController::class, 'store'])
-    ->name('services.store');
-
 Route::get('/facilities', [FacilityController::class, 'index'])
     ->name('facilities.index');
+
+Route::get('/search', [SiteSearchController::class, 'redirect'])
+    ->name('site.search');
 
 Route::middleware('auth')->group(function () {
     Route::get('/account/profile', [ProfileController::class, 'show'])
@@ -52,78 +49,58 @@ Route::middleware('auth')->group(function () {
 
     Route::put('/account/password', [ProfileController::class, 'updatePassword'])
         ->name('account.password.update');
+
     Route::put('/account/profile/photo', [ProfileController::class, 'updatePhoto'])
-    ->name('account.profile.photo.update');
+        ->name('account.profile.photo.update');
+
+    Route::get('/services/facility-availability', [ServiceController::class, 'facilityAvailability'])
+        ->name('services.facility-availability');
+
+    Route::get('/services/{service}', [ServiceController::class, 'show'])
+        ->name('services.show');
+
+    Route::post('/services/{service}', [ServiceController::class, 'store'])
+        ->name('services.store');
 });
 
-Route::prefix('admin/member-management')
-    ->name('admin.members.')
-    ->group(function () {
-        Route::get('/', [UserManagementController::class, 'index'])
-            ->name('index');
 
-        Route::put('/{user}', [UserManagementController::class, 'update'])
-            ->name('update');
+Route::middleware('auth')->group(function () {
+    Route::prefix('admin/member-management')
+        ->name('admin.members.')
+        ->group(function () {
+            Route::get('/', [UserManagementController::class, 'index'])->name('index');
+            Route::put('/{user}', [UserManagementController::class, 'update'])->name('update');
+            Route::delete('/{user}', [UserManagementController::class, 'destroy'])->name('destroy');
+            Route::post('/{user}/ban-service', [UserManagementController::class, 'banService'])->name('ban-service');
+            Route::delete('/{user}/ban-service/{restriction}', [UserManagementController::class, 'unbanService'])->name('unban-service');
+        });
 
-        Route::delete('/{user}', [UserManagementController::class, 'destroy'])
-            ->name('destroy');
+    Route::prefix('admin/website-information')
+        ->name('admin.website.')
+        ->group(function () {
+            Route::get('/', [WebsiteInformationController::class, 'index'])->name('index');
 
-        Route::post('/{user}/ban-service', [UserManagementController::class, 'banService'])
-            ->name('ban-service');
+            Route::resource('announcements', AnnouncementController::class)->names('announcements');
+            Route::resource('resources', AdminResourceController::class)->names('resources');
+            Route::resource('facilities', AdminFacilityController::class)->names('facilities');
 
-        Route::delete('/{user}/ban-service/{restriction}', [UserManagementController::class, 'unbanService'])
-            ->name('unban-service');
-    });
+            Route::patch('announcements/{announcement}/archive', [AnnouncementController::class, 'archive'])->name('announcements.archive');
+            Route::patch('resources/{resource}/archive', [AdminResourceController::class, 'archive'])->name('resources.archive');
+            Route::patch('facilities/{facility}/archive', [AdminFacilityController::class, 'archive'])->name('facilities.archive');
+        });
 
-Route::prefix('admin/website-information')
-    ->name('admin.website.')
-    ->group(function () {
-        Route::get('/', [WebsiteInformationController::class, 'index'])->name('index');
-
-        Route::resource('announcements', AnnouncementController::class)->names('announcements');
-        Route::resource('resources', AdminResourceController::class)->names('resources');
-        Route::resource('facilities', AdminFacilityController::class)->names('facilities');
-
-        Route::patch('announcements/{announcement}/archive', [AnnouncementController::class, 'archive'])
-            ->name('announcements.archive');
-        Route::patch('resources/{resource}/archive', [AdminResourceController::class, 'archive'])
-            ->name('resources.archive');
-        Route::patch('facilities/{facility}/archive', [AdminFacilityController::class, 'archive'])
-            ->name('facilities.archive');
-    });
-
-Route::prefix('admin/services-management')
-    ->name('admin.services-management.')
-    ->group(function () {
-        Route::get('/', [ServiceManagementController::class, 'index'])
-            ->name('index');
-
-        Route::patch('/{serviceKey}/{requestId}/review', [ServiceManagementController::class, 'review'])
-            ->name('review');
-
-        Route::patch('/{serviceKey}/{requestId}/approve', [ServiceManagementController::class, 'approve'])
-            ->name('approve');
-
-        Route::patch('/{serviceKey}/{requestId}/reject', [ServiceManagementController::class, 'reject'])
-            ->name('reject');
-
-        Route::patch('/{serviceKey}/{requestId}/confirm-return', [ServiceManagementController::class, 'confirmReturn'])
-            ->name('confirm-return');
-
-        Route::patch('/{serviceKey}/{requestId}/follow-up', [ServiceManagementController::class, 'followUp'])
-            ->name('follow-up');
-
-        Route::post('/{serviceKey}/{requestId}/penalty', [ServiceManagementController::class, 'addPenalty'])
-            ->name('penalty');
-
-        Route::post('/{serviceKey}/{requestId}/send-letter', [ServiceManagementController::class, 'sendReferralLetter'])
-            ->name('send-letter');
-    });
-
-Route::get('/search', [SiteSearchController::class, 'redirect'])
-    ->name('site.search');
-
-Route::get('/services/facility-availability', [ServiceController::class, 'facilityAvailability'])
-    ->name('services.facility-availability');
+    Route::prefix('admin/services-management')
+        ->name('admin.services-management.')
+        ->group(function () {
+            Route::get('/', [ServiceManagementController::class, 'index'])->name('index');
+            Route::patch('/{serviceKey}/{requestId}/review', [ServiceManagementController::class, 'review'])->name('review');
+            Route::patch('/{serviceKey}/{requestId}/approve', [ServiceManagementController::class, 'approve'])->name('approve');
+            Route::patch('/{serviceKey}/{requestId}/reject', [ServiceManagementController::class, 'reject'])->name('reject');
+            Route::patch('/{serviceKey}/{requestId}/confirm-return', [ServiceManagementController::class, 'confirmReturn'])->name('confirm-return');
+            Route::patch('/{serviceKey}/{requestId}/follow-up', [ServiceManagementController::class, 'followUp'])->name('follow-up');
+            Route::post('/{serviceKey}/{requestId}/penalty', [ServiceManagementController::class, 'addPenalty'])->name('penalty');
+            Route::post('/{serviceKey}/{requestId}/send-letter', [ServiceManagementController::class, 'sendReferralLetter'])->name('send-letter');
+        });
+});
 
 Route::fallback([ErrorController::class, 'notFound']);

@@ -36,20 +36,27 @@ class CatalogController extends Controller
         $catalogResources = $resources
             ->map(function ($resource) {
                 return [
-                    'id'                   => $resource->id,
-                    'title'                => $resource->title,
-                    'isbn'                 => $resource->isbn,
-                    'description'          => $resource->description,
-                    'publication_year'     => $resource->publication_year,
-                    'category_id'          => $resource->category_id,
-                    'category_name'        => $resource->category_name,
-                    'material_type_id'     => $resource->material_type_id,
-                    'material_type_name'   => $resource->material_type_name,
-                    'authors'              => $resource->authors,
-                    'library_locations'    => $resource->library_locations,
-                    'availability_statuses'=> $resource->availability_statuses,
-                    'copy_status_ids'      => $resource->copy_status_ids,
-                    'branch_ids'           => $resource->branch_ids,
+                    'id' => $resource->id,
+                    'title' => $resource->title,
+                    'isbn' => $resource->isbn,
+                    'description' => $resource->description,
+                    'publication_year' => $resource->publication_year,
+                    'category_id' => $resource->category_id,
+                    'category_name' => $resource->category_name,
+                    'material_type_id' => $resource->material_type_id,
+                    'material_type_name' => $resource->material_type_name,
+                    'authors' => $resource->authors,
+                    'library_locations' => $resource->library_locations,
+                    'availability_statuses' => $resource->availability_statuses,
+                    'copy_status_ids' => $resource->copy_status_ids,
+                    'branch_ids' => $resource->branch_ids,
+
+                    'total_copies' => $resource->total_copies,
+                    'available_copies' => $resource->available_copies,
+
+                    'cover_url' => !empty($resource->cover_image_path)
+                        ? $resource->cover_image_path
+                        : asset('images/Iconnic.png'),
                 ];
             })
             ->values();
