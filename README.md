@@ -318,7 +318,6 @@ php artisan serve
 | Mark Joseph B. Neypes | Developer |
 | Princess Izzy Dancal | Quality Assurance |
 | Samantha Salmorin | UI Designer |
-| John Paul Asuzano | UI Designer |
 
 ---
 
